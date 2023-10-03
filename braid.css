@@ -1,7 +1,7 @@
 #canvas {
     background-color: green;
     width: 300px;
-    height:800px;
+    height: 360px;
     position:relative;
     z-index: 0;
 }
@@ -43,13 +43,16 @@
 .overlay {
     width: 100%;
     height: 100%;
-    background-color: red;
+    background-color: blue;
     opacity: 1%;
-    position: relative;
     z-index: 2000; /*when facedown,put on top*/
+    position: absolute;
+    top: 0px;
+    left: 0px;
 }
-.faceup {
-    z-index: 1; /*at same level as pile*/
+
+.talon > .overlay {
+    opacity: 100%;
 }
 .pile.hover {
     border: 4px solid yellow;
@@ -58,4 +61,39 @@
 .card.dragging {
     z-index: 3000 !important;
     transition: top 0s, left 0s;
+}
+.pile.highlight {
+    border: 4px solid red;
+    margin: 0px;
+}
+
+.pile.braid {
+    background: transparent;
+    border: transparent;
+}
+.braidbg {
+    position:absolute;
+}
+.arrow {
+    border: solid cyan;
+  border-width: 0 3px 3px 0;
+  display: inline-block;
+  padding: 3px;
+  visibility:hidden;
+  position:absolute;
+  left: 241.75px;
+  top: 63.5px;
+  width: 1px;
+  height: 1px;
+}
+.arrow.up {
+    transform: rotate(-135deg);
+    -webkit-transform: rotate(-135deg);
+    visibility:visible;
+}
+
+.arrow.down {
+    transform: rotate(45deg);
+    -webkit-transform: rotate(45deg);
+    visibility:visible;
 }
