@@ -1,14 +1,21 @@
+/*I DON'T WANT VW IF IT IS IN LANDSCAPE*/
+body {
+    background-color: green;
+}
 #canvas {
     background-color: green;
-    width: 300px;
-    height: 360px;
+
+/*    width: 300px;
+    height: 300px;*/
+    width: 100%;
+    aspect-ratio: 1;
     position:relative;
     z-index: 0;
 }
 .card {
     background-color: white;
-    width: 30px;
-    height: 20px;
+    width: 10vw;
+    height: 6.67vw;
     border: 1px solid black;
     position: absolute;
     top: 0px;
@@ -16,6 +23,7 @@
     text-align: center;
     cursor: pointer;
     user-select: none;
+    font-size: 5.33vw;
     margin: 3px;
     transition: top 0.2s, left 0.2s;
 }
@@ -37,6 +45,7 @@
     color: white;
     margin: 3px;
     text-align: center;
+    font-size: 5.33vw;
     background-color: rgba(255,255,255,0.1);
     user-select: none;
 }
@@ -71,7 +80,7 @@
     background: transparent;
     border: transparent;
 }
-.braidbg {
+.braidbg,.targetbg {
     position:absolute;
 }
 .arrow {
@@ -96,4 +105,8 @@
     transform: rotate(45deg);
     -webkit-transform: rotate(45deg);
     visibility:visible;
+}
+.buttonFrame {
+    position:absolute;
+    top:80vw;
 }
