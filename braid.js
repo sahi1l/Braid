@@ -25,6 +25,7 @@ let values = ["A","2","3","4","5","6","7","8","9","10","J","Q","K"];
 let sources = [];
 let targets = [];
 let piles = [];
+let mycards = [];
 function randint(start,eww) {//a number start, start+1, ..., eww-1
     if (eww==undefined) {
         eww = start;
@@ -146,6 +147,21 @@ function GetCoords(e) {
 //let dragged = false;
 //let activepile = null;
 
+function coords(x,y) {
+    //convert from points to vw/vh
+    let canvas = $("#canvas")[0].getBoundingClientRect();
+    return {left: (x/canvas.width*100)+"vw",
+            top:  (y/canvas.height*100)+"vh"};
+}
+function adjustPositions() {
+    for (let card of mycards) {
+        if (!(card.pile instanceof Braid)) {
+            card.adjustPosition();
+        }
+    }
+    console.debug("adjusting");
+}
+
 class Card {
     constructor($root,suit,value) {
         this.$root = $root;
@@ -166,8 +182,16 @@ class Card {
         autoBind(this);
 
     }
+    adjustPosition() {
+        if (this.pile) {
+            let R = this.pile.pos();
+            this.$w.css(coords(R[0],R[1]));
+        }
+    }
     move(x,y) {
-        this.$w.css({top: y, left: x});
+        this.$w.css(
+            coords(x,y)
+        );
         this.x = x; this.y = y;
     }
     str() {
@@ -187,7 +211,8 @@ function makedeck($root) {
     //last card always seems to be the same, bleh
 //    let card1 = cards.splice(-1,1)[0];
 //    let pos = randint(0,cards.length);
-//    cards.splice(pos,0,card1);
+    //    cards.splice(pos,0,card1);
+    mycards = [...cards];
     return cards;
 }
 class Pile {
@@ -197,8 +222,8 @@ class Pile {
         this.label = piles.length;
         this.$root = $root;
         if(createQ) {
-            this.$w = $("<div>")
-                .css({top: y, left: x, width: cardwidth, height: cardheight}).appendTo($root);
+            this.$w = $("<div>").addClass("pile")
+                .css({top: y, left: x}).appendTo($root);
         } else {
             this.$w = this.$root;
         }
@@ -582,6 +607,7 @@ function setSizes(Width) {
 }
 function init() {
     let $root = $("#canvas");
+    $(window).on("resize",adjustPositions);
     let Width = $root.width();
     setSizes(Width);
     $root.on("mouseup",selection.dragend);
@@ -590,7 +616,7 @@ function init() {
     $root.on("touchmove",(e)=>{selection.dragmove(e,true);});
     let cards = makedeck($root);
     //BRAID--------------------
-    let braid = new Braid($("#braid"),positions.braid.x,positions.braid.y);
+    let braid = new Braid($("#braid"));
     for (let i=0; i<20; i++) {
         braid.add(cards.pop());
     }

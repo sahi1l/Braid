@@ -1,7 +1,4 @@
 /*I DON'T WANT VW IF IT IS IN LANDSCAPE*/
-:root {
-    --scale: calc(min(1vw,1vh));
-}
 body {
     display: flex;
     flex-direction: row;
@@ -13,8 +10,8 @@ body {
     display: flex;
     flex-direction: row;
     align-items: start;
-    width: calc(100 * var(--scale));
-    height: calc(100 * var(--scale));
+    width: 100vw;
+    height: 100vh;
     aspect-ratio: 1;
     position:relative;
     z-index: 0;
@@ -24,11 +21,13 @@ body {
     position: relative;
 }
 #left {
-    width: 264px;
+    /*width: 264px;*/
+    width: 68.75vw;
 }
 #right {
-    margin-left: 10px;
-    min-width: 100px;
+    margin-left: 0.25vw;
+    /*min-width: 100px;*/
+    width: 31vw;
     display: flex;
     flex-direction: column;
     
@@ -36,12 +35,12 @@ body {
 
 .card,.pile {
     position: absolute;
-    width: calc(10 * var(--scale));
-    height: calc(6.67 * var(--scale));
+    width: 12vw;/*10vmin;*/
+    height: 8.3vh; /*6.67vmin;*/
     margin: 3px;
     text-align: center;
     user-select: none;
-    font-size: calc(5.33 * var(--scale));
+    font-size: 6.5vmin; /*5.33vmin;*/
 }
 .card {
     background-color: white;
@@ -99,16 +98,21 @@ body {
     display:grid;
     grid-template-columns: repeat(4,1fr);
     justify-content: space-evenly;
-    padding-left: 10px; /*this is stupid*/
+    /*padding-left: 10px; /*this is stupid*/
 }
 #free {
     grid-template-rows: 1fr 1fr;
+    position: absolute;
+    left: 0px;
+    top: 75vh;
 }
 #dock {
+    left: 0px;
+    top: 60vh;
     background: linear-gradient(0deg, blue 0%, cyan 50%, blue 100%);
     background-size: cover;
     grid-template-rows: 1fr;
-    margin-bottom: 15px;
+    margin-bottom: 5vh;
     
 }
 .talon > .overlay {
@@ -136,10 +140,17 @@ body {
     border: transparent;
 }
 #braid {
-    height: 200px;
-    width: 265px;
-    position: relative;
-    }
+    height: 58.3vh; /*200px;*/
+    width: 68.75vw; /*265px;*/
+    position: absolute;
+    top: 0px;
+    left: 0px;
+}
+
+#braid .card, #braid .pile {
+    width: 10.6vw;
+    height: 7.77vh;
+}
 .braidbg,.targetbg {
     position:absolute;
 }
@@ -183,5 +194,6 @@ body {
 }
 #buttons {
     display: grid;
-    margin-top: 10px;
+    margin-top: 5vh;
+    padding: 5vh;
 }
