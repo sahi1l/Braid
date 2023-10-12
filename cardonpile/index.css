@@ -1,0 +1,163 @@
+body {
+    display: flex;
+    flex-direction: row;
+    background-color: green;
+}
+#canvas {
+    background-color: green;
+    width: 100%;
+    height: 100%;
+    aspect-ratio: 1;
+    position: relative;
+    z-index: 0;
+}
+#left,#right {
+    display:inline-block;
+    position: relative;
+}
+#left {
+    width: 240px;
+}
+#right {
+    min-width: 100px;
+}
+.card,.pile {
+    width: 8vw;
+    aspect-ratio: 1.5;
+    margin: 5px 0px;
+    z-index: 2;
+    user-select: none;
+    text-align: center;
+    font-size: 23px; /*scale later*/
+    cursor: pointer; /*or maybe just for drag-out*/
+}
+.card {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    pointer-events: none;
+    background-color: white;
+    transition: top 0.1s, left 0.1s;
+    margin: 0px;
+}
+       
+.pile {
+    position: relative;
+    color: white;
+    background-color: rgba(255,255,255,0.1);
+    
+}
+.pile {
+    margin: 4px;
+}
+.pile.hover {
+    border: 4px solid yellow;
+    margin: 0px;
+}
+.pile.highlight {
+    border: 4px solid red;
+    margin: 0px;
+}
+.overlay {
+    position: absolute;
+    margin: 0px;
+    border: 0px;
+    opacity: 1%;
+    width: 100%;
+    height: 100%;
+    top: 0px;
+    left: 0px;
+    z-index: 2000;
+    pointer-events: auto;
+}
+.braidbg {
+    position: absolute;
+}
+#braid {
+    position: relative;
+}
+#braid .braid {
+    position:absolute;
+    width: 100%;
+    height: 100%;
+    top: 0px;
+    left: 0px;
+}
+#braid .braid .card {
+    border: 1px solid black;
+}
+.braidbg,.targetbg {
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    height: 100%;
+}
+div {
+/*    border: 1px solid black;*/
+    margin: 5px;
+}
+#braid {
+    aspect-ratio: 1.2;
+}
+#free,#dock {
+    position: relative;
+    display:grid;
+    grid-template-columns: repeat(4,1fr);
+    justify-content: space-evenly;
+    padding-left: 10px; /*this is stupid*/
+}
+#free {
+    grid-template-rows: 1fr 1fr;
+}
+#dock {
+    background: linear-gradient(0deg, blue 0%, cyan 50%, blue 100%);
+    background-size: cover;
+    grid-template-rows: 1fr;
+    margin-bottom: 15px;
+    
+}
+#foundations {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: repeat(4,1fr);
+    column-gap: 5px;
+    position: relative;
+}
+#direction {
+    position: absolute;
+    left: calc(45% - 2px);
+    top: calc(45% - 1px);
+    width: 10%;
+    margin: 0px;
+    padding: 0px;
+    border: solid cyan;
+    border-width: 0px 4px 4px 0px;
+    border-style: solid;
+    transform: rotate(-45deg);
+    aspect-ratio: 1;
+    min-height: 0px;
+    opacity: 0;
+    transition: opacity 0.1s, transform 0.1s;
+}
+#direction.up {
+    opacity: 1;
+    transform: rotate(-135deg);
+}
+#direction.down {
+    opacity: 1;
+    transform: rotate(45deg);
+}
+#talonbox {
+    display: grid;
+    justify-content: center;
+}
+.talon > .overlay {
+    opacity: 100%;
+    background-color: blue;
+    padding:1px;
+    padding-bottom:2px;
+    margin:0px;
+}
+#buttons {
+    display: grid;
+}

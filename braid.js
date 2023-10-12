@@ -1,6 +1,5 @@
 import autoBind from "./autobind.js";
 let foundation = {};
-let Width;
 let cardwidth;
 let cardheight;
 let left;
@@ -9,7 +8,7 @@ let freetop;
 let foundleft;
 let positions = {};
 
-let braidTargets = [];
+let docks = [];
 let Z = {
     "canvas": 0,
     "cards": 100,
@@ -33,6 +32,7 @@ function randint(start,eww) {//a number start, start+1, ..., eww-1
     }
     return Math.floor((eww-start)*Math.random())+start;
 }
+//------------------------------------------------------------
 let Undo = new class {
     constructor() {
         this.stack = [];
@@ -41,27 +41,37 @@ let Undo = new class {
         this.undo = this.undo.bind(this);
     }
     add(source,target) {
+        //dir is the direction of the foundation: -1,0,1
         this.stack.push([source,target]);
     }
     undo() {
         if (this.stack.length==0) {return;}
         let [source,target] = this.stack.pop();
-        source.add(target.remove());
+        if (target=="flip") {
+            source.unflip();
+        } else {
+            source.add(target.remove());
+            SetDirection();
+        }
         this.rstack.push([source,target]);
     }
     redo() {
         if (this.rstack.length==0) {return;}
         let [source,target] = this.rstack.pop();
-        target.add(source.remove());
+        if (target == "flip") {
+            source.flip();
+        } else {
+            target.add(source.remove());
+        }
         this.stack.push([source,target]);
+        SetDirection();
     }
 }
-function unhighlight() {
-    $(".pile.highlight").removeClass("highlight");
-}
+//------------------------------------------------------------
 
 let selection = new class {
     constructor() {
+        this.$root = $("body");
         this.clear();
         this.shift = {x:-positions.shift,y:-positions.shift};
         autoBind(this);
@@ -71,7 +81,10 @@ let selection = new class {
         this.moved= false; //whether the mouse has moved or not
         this.source= null; //the pile that the card came from
         this.target= null; //the pile that is currently being targeted
-        unhighlight();
+        this.unhighlight();
+    }
+    unhighlight() {
+        $(".pile.highlight").removeClass("highlight");
     }
     reject() {//replaces card.returntopile
         if (this.card==null) {return;}
@@ -79,7 +92,7 @@ let selection = new class {
         this.clear();
     }
     dragstart(pile,e) {
-        unhighlight();
+        this.unhighlight();
         this.card = pile.remove();
         this.card.$w.addClass("dragging");
         this.source = pile;
@@ -89,7 +102,9 @@ let selection = new class {
         if(!this.card) {return;}
         this.card.$w.removeClass("dragging");
         if(!this.moved) {
-            this.source.add(this.card);
+            if (! AutoMoveToFoundation(this.source,this.card)) {
+                this.source.add(this.card);
+            }
         } else if (this.target && this.target.ok(this.card)) {
             this.target.add(this.card);
             Undo.add(this.source,this.target);
@@ -97,13 +112,13 @@ let selection = new class {
             this.reject();
         }
         this.clear();
+        SetDirection();
         e.preventDefault();
     }
     dragmove(e,buttondown) {
         this.moved = true;
         let co = GetCoords(e);
         if (buttondown && this.card) {
-            console.debug(co.x,co.y);
             this.card.move(co.x + this.shift.x,
                            co.y + this.shift.y);
         }
@@ -176,19 +191,23 @@ function makedeck($root) {
     return cards;
 }
 class Pile {
-    constructor($root,x,y) {
+    constructor($root,x,y,createQ=true) {
         this.x = x;
         this.y = y;
         this.label = piles.length;
         this.$root = $root;
-        this.$w = $("<div>")
-            .addClass("pile")
-            .css({top: y, left: x, width: cardwidth, height: cardheight}).appendTo($root);
+        if(createQ) {
+            this.$w = $("<div>")
+                .css({top: y, left: x, width: cardwidth, height: cardheight}).appendTo($root);
+        } else {
+            this.$w = this.$root;
+        }
+        this.$w.addClass("pile");
         this.$overlay = $("<div>")
             .addClass("overlay")
             .appendTo(this.$w);
-//        this.$overlay.on("mouseenter", this.hoverIn);
-//        this.$overlay.on("mouseleave", this.hoverOut);
+        //this.$overlay.on("mouseenter", (e)=>console.log("Entering ",this.label));
+        //this.$overlay.on("mouseleave", (e)=>console.log("Leaving ",this.label));
         this.stack = [];
         piles.push(this);
         autoBind(this);
@@ -209,9 +228,12 @@ class Pile {
     }
     pos(i) {
         //position of the ith card in the pile, extensible for Braid
-        return [this.x, this.y];
+        let R = this.$w[0].getBoundingClientRect();
+        let margin = parseFloat($(this.$w[0]).css("margin-left"));
+        console.debug($(this.$w[0]).css("margin-left"));
+        return [R.left-margin,R.top-margin];
     }
-        
+
     add(card) {
         this.stack.push(card);
         let n = this.stack.length;
@@ -256,7 +278,7 @@ class Talon extends Pile {
         return card;
     }
     flip() {
-        unhighlight();
+        selection.unhighlight();
         if (this.empty()){
             while (!this.target.empty()){
                 this.add(this.target.remove());
@@ -271,11 +293,11 @@ class Talon extends Pile {
 }
 class Braid extends Pile {
     constructor($root,x,y){
-        super($root,x,y);
+        super($root,x,y,false);
         this.$w.addClass("braid");
         this.$overlay.remove();
-        this.x=10;
-        this.y=10;
+        this.x = 10;
+        this.y = 10;
     }
     contains(card) {
         for(let i of this.stack) {
@@ -317,11 +339,16 @@ class DragOut extends Pile {
         if (!(this instanceof Foundation)) {
             sources.push(this);
         }
+        this.$overlay.on("click",(e,pile=this)=>{
+            if (AutoMoveToFoundation(pile,pile.top())) {
+                pile.remove();
+                SetDirection();
+            }
+        });
         this.$overlay.on("mousemove",(e,pile=this)=>{
             if(e.buttons && !selection.card) {selection.dragstart(pile,e);}
         });
         this.$overlay.on("touchstart",(e,pile=this)=>{
-            console.debug("touch");
             selection.dragstart(pile,e);
             e.preventDefault();
         });
@@ -344,32 +371,25 @@ function GetAvailable(braid) {
         if(card) {
             for(let key of foundation.keys) {
                 let label = card.str()+"->"+key;
-                //console.group(label);
                 let target = foundation[key];
                 if (target.ok(card,true)) {//this card could be placed on the thingy
-                    //console.log("ok");
                     let move = false;
                     if(card.value == foundation.value) {
                         move=true;
-                        //console.log("matches foundation value ",foundation.value);
                     }
                     else if (foundation.direction) {
                         if (!(braid.contains(card))) {
-                            //console.log("not in the braid");
                             move=true;
                         }
                     }
                     if(move) {
-                        //console.log("Going to move");
                         Undo.add(pile,target);
                         target.add(card);
                         pile.remove();
                         movedFlag = true;
                     } else {pile.highlight();}
-                    //console.groupEnd();
                     break;
                 }
-                //console.groupEnd();
             }
         }
     }
@@ -380,6 +400,7 @@ class Discard extends DragOut {
         super($root,x,y);
         //not sure if there's anything to add
     }
+
 }
 class DragIn extends DragOut {
     constructor($root,x,y) {
@@ -404,16 +425,11 @@ class Free extends DragIn {
         super($root,x,y);
     }
     ok (card) {
-        return (super.ok(card) && !(selection.source instanceof BraidTargets));
+        return (super.ok(card) && !(selection.source instanceof Dock));
     }
 
 }
-function RunBT() {
-    for(let i of braidTargets) {
-        braidTargets.callback();
-    }
-}
-class BraidTargets extends DragIn {
+class Dock extends DragIn {
     constructor($root,x,y,braid) {
         super($root,x,y);
         this.braid = braid;
@@ -440,12 +456,50 @@ class BraidTargets extends DragIn {
     }
 }
     foundation.direction = 0;
-function SetDirection(dir) {
-    foundation.direction=dir;
-    if(dir>0) {foundation.$arrow.addClass("up");}
-    if(dir<0) {foundation.$arrow.addClass("down");}
-    //change gui to match
+
+function AutoMoveToFoundation(pile,card) {
+    let move = false;
+    if(card) {
+        for(let key of foundation.keys) {
+            let label = card.str()+"->"+key;
+            let target = foundation[key];
+            if (target.ok(card,true)) {
+                Undo.add(pile,target);
+                target.ok(card);
+                target.add(card);
+                return true;
+            }
+        }
+    }
+    return false;
 }
+function Compare(a,b) {
+    if (!a || !b) {return 0;}
+    a = values.indexOf(a.value);
+    b = values.indexOf(b.value);
+    let N = values.length;
+    if (a==b) {return 0;}
+    let V = a - b;
+    let result = 0;
+    if ((V+N+1)%N == 0) {result = 1;}
+    else if ((V+N-1)%N == 0) {result = -1;}
+    return result;
+}
+function GetDirection() {
+    for (let key of foundation.keys) {
+        let dir = foundation[key].getDir();
+        if (dir!=0) {return dir;}
+    }
+    return 0;
+}
+function SetDirection() {
+    let dir = GetDirection();
+    foundation.direction = dir;
+    foundation.$arrow
+        .toggleClass("up",dir>0)
+        .toggleClass("down",dir<0);
+}
+
 class Foundation extends DragIn {
     constructor($root,x,y,suit,start) {
         super($root,x,y);
@@ -458,7 +512,6 @@ class Foundation extends DragIn {
         this.$overlay.appendTo(this.$w);
     }
     highlightNext() {
-        console.debug("yup");
         for(let pile of sources) {
             if (this.ok(pile.top(),true)) {
                 pile.highlight();
@@ -467,6 +520,17 @@ class Foundation extends DragIn {
     }
     unhighlightNext() {
     }
+    getDir(){
+        return Compare(this.stack[0], this.stack[1]);
+/*        let a = this.stack[0];
+        let b = this.stack[1];
+        if (a==undefined || b==undefined) {return 0;}
+        if ((b-a+values.length-1)%values.length == 0) {return 1;}
+        if ((b-a+values.length+1)%values.length == 0) {return -1;}
+        return 0;
+*/
+    }
+    
     ok(card,dontset) {
         if (!card) {return false;}
         if (card.suit!=this.suit){return false;}
@@ -475,20 +539,28 @@ class Foundation extends DragIn {
         }
         let a = values.indexOf(this.top().value);
         let b = values.indexOf(card.value);
-        let dir = 0;
-        if ((b-a+values.length-1)%values.length == 0) {dir=1;}
-        if ((b-a+values.length+1)%values.length == 0) {dir=-1;}
+        let dir = Compare(this.top(), card);
         if (dir==0) {return false;}
         if (dir*foundation.direction==1) {return true;}
-        //if (buildup && foundation.direction>0) {return true;}
-        //if (builddown && foundation.direction<0) {return true;}
         if(foundation.direction == 0) {
-            if(!dontset) {
-                SetDirection(dir);
-            }
             return true;
         }
         return false;
+    }
+    doneQ() {
+        if (Compare(foundation, this.top()) * foundation.direction == -1) {
+            this.$overlay.addClass("done");
+        } else {
+            this.$overlay.removeClass("done")
+        }
+    }
+    add(source, target) {
+        super.add(source,target);
+        this.doneQ();
+    }
+    remove() {
+        super.remove();
+        this.doneQ();
     }
 }
 function setSizes(Width) {
@@ -498,7 +570,6 @@ function setSizes(Width) {
     left = Width/30;
     freetop = top + 7*cardheight;
     foundleft = left + 6.5*cardwidth;
-    console.debug(cardwidth,cardheight,top,left,freetop,foundleft);
     positions = {
         braid: {x:left, y: top},
         targets: {x:left, y:freetop, dx: cardwidth*1.5},
@@ -512,16 +583,14 @@ function setSizes(Width) {
 function init() {
     let $root = $("#canvas");
     let Width = $root.width();
-    console.debug(Width);
     setSizes(Width);
-    console.debug(positions);
     $root.on("mouseup",selection.dragend);
     $root.on("touchend",selection.dragend);
     $root.on("mousemove",(e)=>{selection.dragmove(e,e.buttons)});
-    $root.on("touchmove",(e)=>{console.debug("move");selection.dragmove(e,true);});
+    $root.on("touchmove",(e)=>{selection.dragmove(e,true);});
     let cards = makedeck($root);
     //BRAID--------------------
-    let braid = new Braid($root,positions.braid.x,positions.braid.y);
+    let braid = new Braid($("#braid"),positions.braid.x,positions.braid.y);
     for (let i=0; i<20; i++) {
         braid.add(cards.pop());
     }
@@ -531,28 +600,22 @@ function init() {
               width: 6*cardwidth,
               height: 6*cardwidth
         });
-    let targetback = $("<img src='targetback.png'>").addClass("targetbg").appendTo($root)
-        .css({top: positions.targets.y-1*cardheight, left: positions.targets.x,
-              width: 6*cardwidth, height: 3*cardheight});
-    //BRAID TARGETS--------------------
+    //DOCKS
     for(let i=0; i<=3; i++) {
-        let pile = new BraidTargets($root,
-                                    positions.targets.x + i*positions.targets.dx,
-                                    positions.targets.y,
-                                    braid);
-        braidTargets.push(pile);
+        let pile = new Dock($("#dock"),
+                            0,
+                            0,
+                            braid);
+        docks.push(pile);
         pile.add(cards.pop());
     }
-    //DISCARD PILE--------------------
-    let discard = new Discard($root,positions.talon.x,positions.talon.y);
-
     //FREE--------------------
     let free = [];
     for (let row = 0; row<2; row++) {
         for (let col=0; col<4; col++) {
-            let pile = new Free($root,
-                                  positions.free.x + col*positions.free.dx,
-                                  positions.free.y + row*positions.free.dy
+            let pile = new Free($("#free"),
+                                0,
+                               0
                                  );
 
             free.push(pile);
@@ -560,9 +623,7 @@ function init() {
         }   
     }
     //FOUNDATION--------------------
-    foundation.$arrow = $("<span>")
-        .addClass("arrow")
-        .appendTo($root)
+    foundation.$arrow = $("#direction");
         /*.css({left: positions.foundation.x + positions.foundation.dx*0.75,
               top: positions.foundation.y + positions.foundation.dy*1.75,
               width: 2,
@@ -571,31 +632,31 @@ function init() {
     let card = cards.pop();
     foundation.value = card.value;
     foundation.keys = [];
-    for(let col of [0,1]) {
-        let row = 0;
-        for (let suit of Object.keys(suits)) {
-            foundation[suit+col] = new Foundation($root,
-                                                  positions.foundation.x + col*positions.foundation.dx,
-                                                  positions.foundation.y + row*positions.foundation.dy,
-                                                  suit, card.value);
+    for (let suit of Object.keys(suits)) {
+        for(let col of [0,1]) {
+            let key = suit+col;
+            foundation[key] = new Foundation($("#foundations"),
+                                             0,0,
+                                             suit, foundation.value);
             if (col==0 && suit==card.suit) {
-                foundation[suit+col].add(card);
+                foundation[key].add(card);
             }
-            foundation.keys.push(suit+col);
-            row++;
+            foundation.keys.push(key);
         }
     }
     //TALON--------------------
-    let talon = new Talon($root,
-                          positions.talon.x,
-                          positions.talon.y + positions.talon.dy,
+    let $talon = $("#talonbox");
+    let discard = new Discard($talon,0,0);
+
+    let talon = new Talon($talon,
+                          0,
+                          0,
                           discard,cards);
 
     //BUTTONS--------------------
-    let $buttons = $("<div>").addClass("buttonFrame").appendTo($root)
-    let $undo = $("<button>").html("Undo").on("click",Undo.undo).appendTo($buttons);
-    let $redo = $("<button>").html("Redo").on("click",(e)=>{console.log(Undo);Undo.redo()}).appendTo($buttons);
-    let $avail = $("<button>").html("Available").on("click",(e,b=braid)=>{GetAvailable(b)}).appendTo($buttons);
+    let $avail = $("#available").on("click",(e,b=braid)=>{GetAvailable(b)});
+    let $undo = $("#undo").on("click",Undo.undo);
+    let $redo = $("#redo").on("click",(e)=>{Undo.redo()});
 
 }
 
