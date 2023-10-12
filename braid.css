@@ -163,6 +163,21 @@ body {
     height: 7.77vh;
     position:relative;
 }
+.card {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.card.braidcard {
+    display: flex;
+    justify-content: center;
+}
+.card.braidcard.aligntop {
+    align-items: start;
+}
+.card.braidcard.alignbottom {
+    align-items: end;
+}
 .braidbg,.targetbg {
     width: 100%;
     height: 100%;

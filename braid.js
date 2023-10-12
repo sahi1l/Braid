@@ -18,9 +18,9 @@ let suits = {"H":"&hearts;",
              "S":"&spades;",
              "C":"&clubs;"};
 let colors = {"H": "red",
-              "D": "orange",
+              "D": "#A00",
               "S": "black",
-              "C": "blue"};
+              "C": "#00A"};
 let values = ["A","2","3","4","5","6","7","8","9","10","J","Q","K"];
 let sources = [];
 let targets = [];
@@ -172,12 +172,14 @@ class Card {
         let text = value+suits[suit];
         this.$w = $("<div>")
             .addClass("card")
-            .addClass(`card${value}${suit}`)
-            .html(text+"<p class=bottom>"+text+"</p>")
+            .addClass(`card${value}${suit}`);
+        let span = $("<span>")
+            .html(text) /*+"<p class=bottom>"+text+"</p>")*/
             .css({"color":colors[this.suit],
                  // "width": cardwidth,
                  // "height": cardheight
-                 });
+                 })
+            .appendTo(this.$w);
         this.x=-100; this.y=-100;
         this.move(-100,-100);
         //QUESTION: 
@@ -258,7 +260,6 @@ class Pile {
         //position of the ith card in the pile, extensible for Braid
         let R = this.$w[0].getBoundingClientRect();
         let margin = parseFloat($(this.$w[0]).css("margin-left"));
-        console.debug($(this.$w[0]).css("margin-left"));
         return [R.left-margin,R.top-margin];
     }
 
@@ -327,29 +328,40 @@ class Braid extends Pile {
         this.x = 10;
         this.y = 10;
     }
+    add(card) {
+        super.add(card);
+        card.$w.addClass("braidcard");
+    }
+    remove() {
+        super.remove().removeClass("braidcard");
+    }
     contains(card) {
         for(let i of this.stack) {
             if (card.value == i.value && card.suit == i.suit) {return true;}
         }
         return false;
     }
+    alignment(i) {
+        return this.pos(i)[2];
+    }
     pos(i) {
         //x ranges from 0 to 3
         //y ranges from 0 to 6
         if (true) {
-            let x,y;
-            if (i===0)      {x=0;                 y=4;}
-            else if (i<=3)  {x=0.5+0.04*(i-2);    y=4-i;}
-            else if (i==4)  {x=1;                 y=0;}
-            else if (i<=8)  {x=1.5 + 0.04*(i-6);  y=i-4;}
-            else if (i==9)  {x=2;                 y=5;}
-            else if (i<=13) {x=2.5 + 0.04*(i-11); y=14-i;}
-            else if (i==14) {x=3;                 y=0;}
-            else {x=3.5+0.04*(i-17);                y=i-14;}
+            let x,y,align;
+            if (i===0)      {x=0;                 y=4;    align="bottom";}
+            else if (i<=3)  {x=0.5+0.04*(i-2);    y=4-i;  align="bottom";}
+            else if (i==4)  {x=1;                 y=0;    align="";   }
+            else if (i<=8)  {x=1.5 + 0.04*(i-6);  y=i-4;  align="top";}
+            else if (i==9)  {x=2;                 y=5;    align="";}
+            else if (i<=13) {x=2.5 + 0.04*(i-11); y=14-i; align="bottom";}
+            else if (i==14) {x=3;                 y=0;    align="top";}
+            else {x=3.5+0.04*(i-17);                y=i-14;  align="top";}
             let braid = $("#braid")[0].getBoundingClientRect();
             let L = [
                 (braid.left + x * 0.2*braid.width),
-                (braid.top  + y * 0.14*braid.height)];
+                (braid.top  + y * 0.14*braid.height),
+            align];
             return L;
 /*            return [this.x + x * cardwidth*1.5,
               this.y + y * cardheight*0.9]
@@ -619,8 +631,14 @@ function init() {
     let braid = new Braid($("#braid"));
     for (let i=0; i<20; i++) {
         braid.add(cards.pop());
+        let card = braid.top();
+        card.align = braid.alignment(braid.stack.length);
+        console.log(card.align);
+        if (card.align) {
+            console.debug(card,card.align);
+            card.$w.addClass("align"+card.align);
+        }
     }
-    console.debug(braid.stack);
     let braidback = $("<img src='braidback.png'>").addClass("braidbg").appendTo("#braid")
         .css({//top: positions.braid.y + 2*cardheight,
               //left: positions.braid.x,
@@ -638,10 +656,7 @@ function init() {
     let free = [];
     for (let row = 0; row<2; row++) {
         for (let col=0; col<4; col++) {
-            let pile = new Free($("#free"),
-                                0,
-                               0
-                                 );
+            let pile = new Free($("#free"),0,0);
 
             free.push(pile);
             pile.add(cards.pop());
