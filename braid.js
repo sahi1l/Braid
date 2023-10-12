@@ -334,29 +334,26 @@ class Braid extends Pile {
         return false;
     }
     pos(i) {
-        //this is an arc down and to the left
-        if (false) {
-            this.x = 220;
-            this.y = 300;
-            let dx = this.x;
-            let dy = cardheight*20*0.8;
-            let p = (19-i)/20.0;
-            let yi = this.y - p * dy;
-            let xi = this.x - dx * Math.sqrt(1-p**2);
-            return [xi,yi];
-        }
+        //x ranges from 0 to 3
+        //y ranges from 0 to 6
         if (true) {
             let x,y;
-            if (i===0) {x=-0.5;y=4;}
-            else if (i<=3) {x=0+0.04*(i-2)  ;y=4-i;}
-            else if (i==4) {x=0.5; y=0;}
-            else if (i<=8) {x=1 + 0.04*(i-6); y=i-4;}
-            else if (i==9) {x=1.5; y=5;}
-            else if (i<=13) {x=2 + 0.04*(i-11); y=14-i;}
-            else if (i==14) {x=2.5; y=0;}
-            else {x=3+0.04*(i-17); y=i-14;}
-            return [this.x + x * cardwidth*1.5,
-                    this.y + y * cardheight*0.9]
+            if (i===0)      {x=0;                 y=4;}
+            else if (i<=3)  {x=0.5+0.04*(i-2);    y=4-i;}
+            else if (i==4)  {x=1;                 y=0;}
+            else if (i<=8)  {x=1.5 + 0.04*(i-6);  y=i-4;}
+            else if (i==9)  {x=2;                 y=5;}
+            else if (i<=13) {x=2.5 + 0.04*(i-11); y=14-i;}
+            else if (i==14) {x=3;                 y=0;}
+            else {x=3.5+0.04*(i-17);                y=i-14;}
+            let braid = $("#braid")[0].getBoundingClientRect();
+            let L = [
+                (braid.left + x * 0.2*braid.width),
+                (braid.top  + y * 0.14*braid.height)];
+            return L;
+/*            return [this.x + x * cardwidth*1.5,
+              this.y + y * cardheight*0.9]
+              */
         }
         return [];
     };
@@ -623,11 +620,10 @@ function init() {
     for (let i=0; i<20; i++) {
         braid.add(cards.pop());
     }
-    let braidback = $("<img src='braidback.png'>").addClass("braidbg").appendTo($root)
+    console.debug(braid.stack);
+    let braidback = $("<img src='braidback.png'>").addClass("braidbg").appendTo("#braid")
         .css({//top: positions.braid.y + 2*cardheight,
               //left: positions.braid.x,
-              width: 6*cardwidth,
-              height: 6*cardwidth
         });
     //DOCKS
     for(let i=0; i<=3; i++) {

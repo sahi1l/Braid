@@ -161,9 +161,11 @@ body {
 #braid .card, #braid .pile {
     width: 10.6vw;
     height: 7.77vh;
+    position:relative;
 }
 .braidbg,.targetbg {
-    position:absolute;
+    width: 100%;
+    height: 100%;
 }
 #foundations {
     display: grid;
