@@ -42,6 +42,17 @@ body {
     user-select: none;
     font-size: 6.5vmin; /*5.33vmin;*/
 }
+.card>.bottom {
+    margin:0px;
+    position:absolute;
+    bottom: 0px;
+    width: 100%;
+    text-align: center;
+    padding:0px;
+    background-color: white;
+    overflow: clip;
+    
+}
 .card {
     background-color: white;
     border: 1px solid black;

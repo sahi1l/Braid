@@ -154,6 +154,8 @@ function coords(x,y) {
             top:  (y/canvas.height*100)+"vh"};
 }
 function adjustPositions() {
+    let canvas = $("#canvas")[0].getBoundingClientRect();
+    $(".card.bottom").toggle(canvas.height>canvas.width);
     for (let card of mycards) {
         if (!(card.pile instanceof Braid)) {
             card.adjustPosition();
@@ -167,10 +169,11 @@ class Card {
         this.$root = $root;
         this.suit = suit;
         this.value = value;
+        let text = value+suits[suit];
         this.$w = $("<div>")
             .addClass("card")
             .addClass(`card${value}${suit}`)
-            .html(value+suits[suit])
+            .html(text+"<p class=bottom>"+text+"</p>")
             .css({"color":colors[this.suit],
                  // "width": cardwidth,
                  // "height": cardheight
