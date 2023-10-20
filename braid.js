@@ -110,9 +110,10 @@ let Undo = new class {
 
 let selection = new class {
     constructor() {
+        let shift = 
         this.$root = $("body");
         this.clear();
-        this.shift = {x:-positions.shift,y:-positions.shift};
+        this.shift = {x:0,y:0};
         autoBind(this);
     }
     clear() {
@@ -134,6 +135,8 @@ let selection = new class {
         if(DEBUG){console.debug("DRAGSTART");}
         this.unhighlight();
         this.card = pile.remove();
+        let duh = this.card.$w[0].getBoundingClientRect();
+        this.shift = {x:duh.left-e.clientX, y:duh.top-e.clientY};
         this.card.$w.addClass("dragging");
         this.source = pile;
         
@@ -382,8 +385,11 @@ class Braid extends Pile {
         super($root,x,y,false);
         this.$w.addClass("braid");
         this.$overlay.remove();
-        this.x = 10;
-        this.y = 10;
+/*        this.$background = $("<svg width=100% height=100%>")
+            .appendTo(this.$root);
+        $('<circle cx="50" cy="50" r="40" stroke="green" stroke-width="4" fill="yellow" />').appendTo(this.$background);*/
+//        this.x = 10;
+//        this.y = 10;
     }
     add(card) {
         if(card==undefined) {return;}
@@ -640,7 +646,6 @@ function SetDirection() {
         .toggleClass("down",dir<0);
 }
 
-
 class Foundation extends DragIn {
     constructor($root,x,y,suit,start) {
         super($root,x,y);
@@ -721,7 +726,8 @@ function setSizes(Width) {
         talon: {x: foundleft + cardwidth, y: freetop, dy: cardheight*1.5},
         shift: Width/12,
     }
-    selection.shift = {x:-positions.shift, y:-positions.shift};
+//    selection.shift = {x:-positions.shift, y:-positions.shift};
+//    console.debug("shift=",positions.shift);
 }
 function CheckWin() {
     let total = 0;
