@@ -221,7 +221,26 @@ body {
     opacity: 50%;
 }
 #buttons {
-    display: grid;
+    display: flex;
     margin-top: 5vh;
-    padding: 5vh;
+    
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+#buttons>button {
+    width: 15vmin;
+    height: 15vmin;
+    border-radius: 5px;
+    background-size: cover;
+    margin: 1vmin;
+}
+#available {
+    background: url("icons/available.png");
+}
+#undo {
+    background: url("icons/undo.png");
+}
+#redo {
+    background: url("icons/redo.png");
 }

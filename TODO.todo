@@ -1,19 +1,24 @@
 * The card is a bit offset from the mouse pointer which makes things confusing
 * The direction arrow isn't properly centered
 * There's probably a lot of dead code to clear out
-* I can't play the top card of the braid!
+* TODO I can't play the top card of the braid!
 ** Easiest way to fix this would be to add another dock.
 ** I could shift all the braid cards along the path too! That would be kinda neat.
-* Want to reshape the buttons, make them bigger
+* TODO Want to reshape the buttons, make them bigger
+** Maybe a different configuration 
 * The Restart button doesn't work yet
 * Show the number of cards in the Discard pile
 * Show the number of times the talon has been redone
-* Add a #win message
-* Prevent scrolling
-* TODO Test on phone
-
+* TODO Add a #win message
+* TODO Prevent scrolling
+* TODO I can't drag or click from the dock on the Android (but not on the simulator)
+* Add a function that runs at the end of each "move", which
+** Checks for a win
+** Unhighlights everything
+** 
 
 * Option to have available turned on automatically, after every play
 ** Possibly without the automatic thingy
 * Add the ability to add "snapshots" to the Undo stack, so that you can rewind back to certain points
 * Clicking on a discard card adds it to a spare free pile if it can't go onto the foundation
+* Option to reverse left and right
