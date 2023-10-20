@@ -1,8 +1,12 @@
 /*I DON'T WANT VW IF IT IS IN LANDSCAPE*/
+html,body {
+    margin: 0px;
+    height: 100%;
+    overflow: hidden;
+}    
 body {
     display: flex;
     flex-direction: row;
-    margin: 0px;
     background-color: green;
 }
 #canvas {
@@ -27,7 +31,7 @@ body {
 #right {
     margin-left: 0.25vw;
     /*min-width: 100px;*/
-    width: 31vw;
+    width: 28vw;
     display: flex;
     flex-direction: column;
     
@@ -188,6 +192,7 @@ body {
     grid-template-rows: repeat(4,1fr);
     column-gap: 5px;
     position: relative;
+    justify-items: center;
 }
 
 
@@ -199,21 +204,21 @@ body {
     margin: 0px;
     padding: 0px;
     border: solid cyan;
-    border-width: 0px 4px 4px 0px;
+    border-width: 0px 16px 16px 0px;
     border-style: solid;
     transform: rotate(-45deg);
     aspect-ratio: 1;
     min-height: 0px;
     opacity: 0;
     transition: opacity 0.1s, transform 0.1s;
-    z-index: 3;
+    z-index: 3000;
 }
 #direction.up {
-    opacity: 1;
+    opacity: 0.5;
     transform: rotate(-135deg);
 }
 #direction.down {
-    opacity: 1;
+    opacity: 0.5;
     transform: rotate(45deg);
 }
 

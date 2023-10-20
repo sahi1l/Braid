@@ -392,6 +392,7 @@ class Braid extends Pile {
         super.add(card);
         this.output();
         card.$w.addClass("braidcard");
+        this.flow();
         }
     output() {
         if (!DEBUG) {return;}
@@ -415,6 +416,7 @@ class Braid extends Pile {
         if(DEBUG){console.debug("BRAID REMOVE: ",card.str());}
         card.$w.removeClass("braidcard");
         this.output();
+        this.flow();
         return card;
     }
     contains(card) {
@@ -426,30 +428,33 @@ class Braid extends Pile {
     alignment(i) {
         return this.pos(i)[2];
     }
+    flow() {
+        let N = this.stack.length;
+        for (let i=0; i<N; i++) {
+            this.stack[i].move(...this.pos(i+(20-N)));
+        }
+    }
     pos(i) {
         //x ranges from 0 to 3
         //y ranges from 0 to 6
-        if (true) {
-            let x,y,align;
-            if (i===0)      {x=0;                 y=4;    align="bottom";}
-            else if (i<=3)  {x=0.5+0.04*(i-2);    y=4-i;  align="bottom";}
-            else if (i==4)  {x=1;                 y=0;    align="";   }
-            else if (i<=8)  {x=1.5 + 0.04*(i-6);  y=i-4;  align="top";}
-            else if (i==9)  {x=2;                 y=5;    align="";}
-            else if (i<=13) {x=2.5 + 0.04*(i-11); y=14-i; align="bottom";}
-            else if (i==14) {x=3;                 y=0;    align="top";}
-            else {x=3.5+0.04*(i-17);                y=i-14;  align="top";}
-            let braidbox = $("#braid")[0].getBoundingClientRect();
-            let L = [
-                (braidbox.left + x * 0.20*braidbox.width),
-                (braidbox.top  + y * 0.14*braidbox.height),
+        let x,y,align;
+        if (i===0)      {x=0;                 y=4;    align="bottom";}
+        else if (i<=3)  {x=0.5+0.04*(i-2);    y=4-i;  align="bottom";}
+        else if (i==4)  {x=1;                 y=0;    align="";   }
+        else if (i<=8)  {x=1.5 + 0.04*(i-6);  y=i-4;  align="top";}
+        else if (i==9)  {x=2;                 y=5;    align="";}
+        else if (i<=13) {x=2.5 + 0.04*(i-11); y=14-i; align="bottom";}
+        else if (i==14) {x=3;                 y=0;    align="top";}
+        else {x=3.5+0.04*(i-17);                y=i-14;  align="top";}
+        let braidbox = $("#braid")[0].getBoundingClientRect();
+        let L = [
+            (braidbox.left + x * 0.20*braidbox.width),
+            (braidbox.top  + y * 0.14*braidbox.height),
             align];
-            return L;
-/*            return [this.x + x * cardwidth*1.5,
-              this.y + y * cardheight*0.9]
-              */
-        }
-        return [];
+        return L;
+        /*            return [this.x + x * cardwidth*1.5,
+                      this.y + y * cardheight*0.9]
+        */
     };
 }
 class DragOut extends Pile {
@@ -634,6 +639,7 @@ function SetDirection() {
         .toggleClass("up",dir>0)
         .toggleClass("down",dir<0);
 }
+
 
 class Foundation extends DragIn {
     constructor($root,x,y,suit,start) {
