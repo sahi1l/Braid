@@ -1,14 +1,10 @@
 import autoBind from "./autobind.js";
 let DEBUG = false
 let foundation = {};
-let cardwidth;
-let cardheight;
-let left;
-let top;
-let freetop;
-let foundleft;
-let positions = {};
-
+let Ndocks=5;
+let Nbraid=19;
+let Nfree = 8;
+let Ndecks = 2;
 let docks = {};
 
 let Z = {
@@ -37,6 +33,15 @@ function randint(start,eww) {//a number start, start+1, ..., eww-1
     return Math.floor((eww-start)*Math.random())+start;
 }
 //------------------------------------------------------------
+function adjustPositions() {
+    let canvas = $("#canvas")[0].getBoundingClientRect();
+    $(".card.bottom").toggle(canvas.height>canvas.width);
+    for (let card of mycards) {
+        if (!(card.pile instanceof Braid)) {
+            card.adjustPosition();
+        }
+    }
+}
 function printstack(stack,label){
     let result = [];
     for (let card of stack) {
@@ -156,7 +161,7 @@ let selection = new class {
             this.reject();
         }
         this.clear();
-        SetDirection();
+        IsDone();
         e.preventDefault();
     }
     dragmove(e,buttondown) {
@@ -196,16 +201,6 @@ function coords(x,y) {
     return {left: (x/canvas.width*100)+"vw",
             top:  (y/canvas.height*100)+"vh"};
 }
-function adjustPositions() {
-    let canvas = $("#canvas")[0].getBoundingClientRect();
-    $(".card.bottom").toggle(canvas.height>canvas.width);
-    for (let card of mycards) {
-        if (!(card.pile instanceof Braid)) {
-            card.adjustPosition();
-        }
-    }
-}
-
 class Card {
     constructor($root,suit,value) {
         this.$root = $root;
@@ -218,8 +213,6 @@ class Card {
         let span = $("<span>")
             .html(text) /*+"<p class=bottom>"+text+"</p>")*/
             .css({"color":colors[this.suit],
-                 // "width": cardwidth,
-                 // "height": cardheight
                  })
             .appendTo(this.$w);
         this.x=-100; this.y=-100;
@@ -247,7 +240,7 @@ class Card {
 }
 function makedeck($root) {
     let cards = [];
-    for (let n = 1; n<=2; n++) {
+    for (let n = 1; n<=Ndecks; n++) {
         for (let suit of "DHCS") {
             for (let val of values) {
                 let pos = randint(0,cards.length+1); //because you can insert cards at the end too
@@ -458,9 +451,6 @@ class Braid extends Pile {
             (braidbox.top  + y * 0.14*braidbox.height),
             align];
         return L;
-        /*            return [this.x + x * cardwidth*1.5,
-                      this.y + y * cardheight*0.9]
-        */
     };
 }
 class DragOut extends Pile {
@@ -471,8 +461,9 @@ class DragOut extends Pile {
         }
         this.$overlay.on("click",(e,pile=this)=>{//UI
             if (AutoMoveToFoundation(pile,pile.top())) {
-                pile.remove(); 
-                SetDirection();
+                pile.remove();
+                IsDone();
+                //SetDirection();
             }
         });
         this.$overlay.on("mousemove",(e,pile=this)=>{
@@ -528,6 +519,7 @@ function GetAvailable() {//UI
 class Discard extends DragOut {
     constructor($root,x,y) {
         super($root,x,y);
+        this.$w.attr("id","discard");
         //not sure if there's anything to add
     }
 
@@ -561,7 +553,7 @@ class Free extends DragIn {
 }
 function DockString() {
     let result = [];
-    for(let i=0; i<=3; i++) {
+    for(let i=0; i<Ndocks; i++) {
         if(docks[i]) {
             if(docks[i].top()) {
                 result.push(docks[i].top().str());
@@ -668,13 +660,6 @@ class Foundation extends DragIn {
     }
     getDir(){
         return Compare(this.stack[0], this.stack[1]);
-/*        let a = this.stack[0];
-        let b = this.stack[1];
-        if (a==undefined || b==undefined) {return 0;}
-        if ((b-a+values.length-1)%values.length == 0) {return 1;}
-        if ((b-a+values.length+1)%values.length == 0) {return -1;}
-        return 0;
-*/
     }
     
     ok(card,dontset) {
@@ -711,24 +696,6 @@ class Foundation extends DragIn {
         return result;
     }
 }
-function setSizes(Width) {
-    cardwidth = Width/10.0;
-    cardheight = Width/15.0;
-    top = Width/30;
-    left = Width/30;
-    freetop = top + 7*cardheight;
-    foundleft = left + 6.5*cardwidth;
-    positions = {
-        braid: {x:left, y: top},
-        targets: {x:left, y:freetop, dx: cardwidth*1.5},
-        free: {x: left, y:freetop + 1.5*cardheight + 0.5*cardheight, dx: cardwidth*1.5, dy: cardheight*1.5},
-        foundation: {x: foundleft, y: top, dx: cardwidth*1.5, dy: cardheight*1.5},
-        talon: {x: foundleft + cardwidth, y: freetop, dy: cardheight*1.5},
-        shift: Width/12,
-    }
-//    selection.shift = {x:-positions.shift, y:-positions.shift};
-//    console.debug("shift=",positions.shift);
-}
 function CheckWin() {
     let total = 0;
     let result = [];
@@ -739,11 +706,16 @@ function CheckWin() {
     $("#win").toggleClass("win",total==104);
     if(DEBUG) {console.debug("total=",total,result.join(" "));}
 }
+function IsDone() {
+    CheckWin();
+    selection.unhighlight();
+    adjustPositions();
+    SetDirection();
+}
 function init() {
     let $root = $("#canvas");
-    $(window).on("resize",adjustPositions);
+    $(window).on("resize",IsDone);
     let Width = $root.width();
-    setSizes(Width);
     $root.on("mouseup",selection.dragend);//UI
     $root.on("touchend",selection.dragend);//UI
     $root.on("mousemove",(e)=>{selection.dragmove(e,e.buttons)});
@@ -752,7 +724,7 @@ function init() {
     //BRAID--------------------
     braid = new Braid($("#braid"));
     braid.name = "@B";
-    for (let i=0; i<20; i++) {
+    for (let i=0; i<Nbraid; i++) {
         braid.add(cards.pop());
         let card = braid.top();
         card.align = braid.alignment(braid.stack.length);
@@ -760,12 +732,9 @@ function init() {
             card.$w.addClass("align"+card.align);
         }
     }
-    let braidback = $("<img src='braidback.png'>").addClass("braidbg").appendTo("#braid")
-        .css({//top: positions.braid.y + 2*cardheight,
-              //left: positions.braid.x,
-        });
+    let braidback = $("<img src='braidback.png'>").addClass("braidbg").appendTo("#braid");
     //DOCKS
-    for(let i=0; i<=3; i++) {
+    for(let i=0; i<Ndocks; i++) {
         let pile = new Dock($("#dock"),0,0,braid);
         pile.name = "@D"+(i+1);
         pile.add(cards.pop());
@@ -775,7 +744,7 @@ function init() {
     //FREE--------------------
     let free = [];
     for (let row = 0; row<2; row++) {
-        for (let col=0; col<4; col++) {
+        for (let col=0; col<Nfree; col+=2) {
             let pile = new Free($("#free"),0,0);
             pile.name= "@Fr"+(row+1)+(col+1);
             free.push(pile);
@@ -784,16 +753,12 @@ function init() {
     }
     //FOUNDATION--------------------
     foundation.$arrow = $("#direction");
-        /*.css({left: positions.foundation.x + positions.foundation.dx*0.75,
-              top: positions.foundation.y + positions.foundation.dy*1.75,
-              width: 2,
-              height:2})*/;
     
     let card = cards.pop();
     foundation.value = card.value;
     foundation.keys = [];
     for (let suit of Object.keys(suits)) {
-        for(let col of [0,1]) {
+        for (let col=0; col<Ndecks; col++) {
             let key = suit+col;
             foundation[key] = new Foundation($("#foundations"),
                                              0,0,
@@ -819,6 +784,8 @@ function init() {
     let $undo = $("#undo").on("click",Undo.undo);
     let $redo = $("#redo").on("click",(e)=>{Undo.redo()});
     braid.output();
+    IsDone();
+    $("#rules").on("click",()=>{$("#popup").toggle();});
     console.log("=====READY=====");
     
 }

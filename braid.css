@@ -70,7 +70,8 @@ body {
     transition: top 1s, left 1s;
 }
 .back {
-    background-color: blue;
+    background: url("cardback.png");
+    background-size: cover;
     border: 2px solid white;
     width: 100%;
     height: 100%;
@@ -87,7 +88,8 @@ body {
 .overlay {
     width: 100%;
     height: 100%;
-    background-color: blue;
+    background: url("cardback.png");
+    background-size: cover;
     opacity: 1%;
     z-index: 2000; /*when facedown,put on top*/
     position: absolute;
@@ -97,9 +99,29 @@ body {
 
 #talonbox {
     display: grid;
-    justify-content: center;
+    justify-content: end;
     position: relative;
+    grid-template-columns: 20vh 1fr;
+    column-gap: 1vh;
+    grid-template-rows: 1fr 1fr;
+    width: 45%;
 }
+#mid {
+    display: flex;
+    flex-direction: row;
+    justify-content: end;
+    margin-top: 7vh;
+}
+#talonbox>.pile {grid-column: 2;}
+#available {
+    display: inline-block;
+    background: url("icons/available.png");
+    background-size: cover;
+    width: 12vmin;
+    height: 12vmin;
+    margin-right: 3vw;
+}
+
 #talonbox .card,
 #talonbox .pile,
 #free .card,
@@ -114,10 +136,10 @@ body {
 #free,#dock {
     position: relative;
     display:grid;
-    grid-template-columns: repeat(4,1fr);
     justify-content: space-evenly;
-    /*padding-left: 10px; /*this is stupid*/
 }
+#free {grid-template-columns: repeat(4,1fr);}
+#dock {grid-template-columns: repeat(5,1fr);}
 #free {
     grid-template-rows: 1fr 1fr;
     position: absolute;
@@ -163,6 +185,7 @@ body {
     position: absolute;
     top: 0px;
     left: 0px;
+    z-index: 2;
 }
 
 #braid .card, #braid .pile {
@@ -193,7 +216,7 @@ body {
     display: grid;
     grid-template-columns: 1fr 1fr;
     grid-template-rows: repeat(4,1fr);
-    column-gap: 5px;
+    column-gap: 1vh;
     position: relative;
     justify-items: center;
 }
@@ -236,21 +259,20 @@ body {
     flex-wrap: wrap;
     justify-content: center;
 }
-#buttons>button {
-    width: 15vmin;
-    height: 15vmin;
-    border-radius: 5px;
+#buttons button {
+    width: 18vmin;
+    height: 18vmin;
+    border-radius: 10px;
     background-size: cover;
     margin: 1vmin;
 }
-#available {
-    background: url("icons/available.png");
-}
 #undo {
     background: url("icons/undo.png");
+    background-size: cover;
 }
 #redo {
     background: url("icons/redo.png");
+    background-size: cover;
 }
 
 .tooltip {/*apply this class to the object that receives the tip*/
@@ -272,3 +294,78 @@ body {
     z-index: 5000;
 }
 
+#win {
+    font-size: 128px;
+    text-align: center;
+    position: absolute;
+    color: purple;
+    font-family: sans-serif;
+    background-color: rgba(255,255,255,0.5);
+    width: 100%;
+    top: 50%;
+    font-weight: bold;
+    display: none;
+}
+.help {
+    font-family: sans-serif;
+    font-size: 5vmin;
+    color: rgba(255,255,255,0.5);
+    position: absolute;
+    top: 50vh;
+    left: 50vw;
+    text-align: center;
+}
+.help#freehelp {
+    top: 95vh;
+    left: 22.5vw;
+}
+.help#dockshelp {
+    top: 55vh;
+    left: 31.5vw;
+}
+.help#braidhelp {
+    top: 40vh;
+    left: 10vw;
+}
+.help#foundationhelp {
+    top: 38vh;
+    left: 77vw;
+}
+#rules {
+    position: absolute;
+    cursor: pointer;
+    top:  38vh;
+    left: 1vw;
+    padding: 5px;
+    font-size: 10vmin;
+    z-index: 0;
+    
+}
+#rules>img {
+    height: 20vmin;
+    opacity: 0.5;
+}
+#popup {
+    border: 4px solid black;
+    position: fixed;
+    left: 30vw;
+    top: 10vh;
+    width: 40vw;
+    font-size: 3vmin;
+    color: black;
+    background-color: white;
+    text-align: left;
+    opacity: 1;
+    z-index: 9999;
+    display: none;
+    padding: 3vmin;
+    margin: 0px;
+    
+}
+#popup>h2 {
+    margin: 0px;
+}
+#popup>ul {
+    margin: 2px;
+    padding: 0px;
+}

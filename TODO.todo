@@ -16,8 +16,9 @@
 ** This only happened once
 ** Touch might need a little debugging
 * Add a function that runs at the end of each "move", which...
-** Checks for a win
-** Unhighlights everything (or fixes the highlighting, anyway)
+** Checks for a win: CheckWin
+** Adjusts cards: adjustPositions
+** Unhighlights everything (or fixes the highlighting, anyway): selection.unhighlight()
 * TODO Add documentation
 ** Help button and a text popover.
 ** Tooltips
