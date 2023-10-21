@@ -1,4 +1,5 @@
 import autoBind from "./autobind.js";
+
 let DEBUG = false
 let foundation = {};
 let Ndocks=5;
@@ -42,7 +43,7 @@ function adjustPositions() {
         }
     }
 }
-function printstack(stack,label){
+/*function printstack(stack,label){
     let result = [];
     for (let card of stack) {
         if(card.str) {
@@ -54,7 +55,7 @@ function printstack(stack,label){
         }
     }
     console.log((label??"")+":"+result.join(' '));
-}
+}*/
 let Undo = new class {
     constructor() {
         this.stack = [];
