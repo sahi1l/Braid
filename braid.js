@@ -520,6 +520,8 @@ class Discard extends DragOut {
     constructor($root,x,y) {
         super($root,x,y);
         this.$w.attr("id","discard");
+        this.$overlay.html("Discard");
+        console.debug(this.$o);
         //not sure if there's anything to add
     }
 
