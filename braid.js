@@ -725,7 +725,9 @@ function init() {
     $root.on("mouseup",selection.dragend);//UI
     $root.on("touchend",selection.dragend);//UI
     $root.on("mousemove",(e)=>{selection.dragmove(e,e.buttons)});
-    $root.on("touchmove",(e)=>{selection.dragmove(e,true);});
+    $root.on("touchmove",(e)=>{
+        console.debug("touchmove");
+        selection.dragmove(e,true);});
     let cards = makedeck($root);
     //BRAID--------------------
     braid = new Braid($("#braid"));
