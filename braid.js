@@ -171,8 +171,12 @@ let selection = new class {
         let co = GetCoords(e);
         console.debug("co=",co);
         if (buttondown && this.card) {
+            console.debug("moving card");
             this.card.move(co.x + this.shift.x,
                            co.y + this.shift.y);
+        } else {
+            console.debug("buttondown=",buttondown);
+            console.debug("this.card=",this.card);
         }
         this.target = null;
         for (let p of targets) {
@@ -187,10 +191,7 @@ let selection = new class {
 };
 
 function GetCoords(e) {
-    console.debug("GetCoords");
-    console.debug("e=",e);
     let ct = e.changedTouches;
-    console.debug("ct=",ct);
     if (ct) {
         return {x:ct[0].pageX,y:ct[0].pageY};
     } else {
@@ -798,7 +799,7 @@ function init() {
     braid.output();
     IsDone();
     $("#rules").on("click",()=>{$("#popup").toggle();});
-    console.log("=====READY3=====");
+    console.log("=====READY4=====");
     
 }
 
