@@ -116,7 +116,6 @@ let Undo = new class {
 
 let selection = new class {
     constructor() {
-        let shift = 
         this.$root = $("body");
         this.clear();
         this.shift = {x:0,y:0};
@@ -143,12 +142,12 @@ let selection = new class {
         this.card = pile.remove();
         let duh = this.card.$w[0].getBoundingClientRect();
         this.shift = {x:duh.left-e.clientX, y:duh.top-e.clientY};
+        console.debug("shift=",this.shift);
         this.card.$w.addClass("dragging");
         this.source = pile;
         
     }
     dragend(e) {//UI
-        console.debug("dragend");
         if(!this.card) {return;}
         if(DEBUG) {console.debug("DRAGEND");}
         this.card.$w.removeClass("dragging");
@@ -169,14 +168,9 @@ let selection = new class {
     dragmove(e,buttondown) {
         this.moved = true;
         let co = GetCoords(e);
-        console.debug("co=",co);
         if (buttondown && this.card) {
-            console.debug("moving card");
             this.card.move(co.x + this.shift.x,
                            co.y + this.shift.y);
-        } else {
-            console.debug("buttondown=",buttondown);
-            console.debug("this.card=",this.card);
         }
         this.target = null;
         for (let p of targets) {
@@ -236,6 +230,7 @@ class Card {
         }
     }
     move(x,y) {
+        console.debug("Moving card %s to",this.str(),coords(x,y));
         this.$w.css(
             coords(x,y)
         );
@@ -799,7 +794,7 @@ function init() {
     braid.output();
     IsDone();
     $("#rules").on("click",()=>{$("#popup").toggle();});
-    console.log("=====READY4=====");
+    console.log("=====READY5=====");
     
 }
 
