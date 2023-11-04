@@ -148,6 +148,7 @@ let selection = new class {
         
     }
     dragend(e) {//UI
+        console.debug("dragend");
         if(!this.card) {return;}
         if(DEBUG) {console.debug("DRAGEND");}
         this.card.$w.removeClass("dragging");
@@ -461,6 +462,7 @@ class DragOut extends Pile {
             sources.push(this);
         }
         this.$overlay.on("click",(e,pile=this)=>{//UI
+            console.debug("click");
             if (AutoMoveToFoundation(pile,pile.top())) {
                 pile.remove();
                 IsDone();
@@ -468,9 +470,11 @@ class DragOut extends Pile {
             }
         });
         this.$overlay.on("mousemove",(e,pile=this)=>{
+            console.debug("mousemove");
             if(e.buttons && !selection.card) {selection.dragstart(pile,e);}
         });
         this.$overlay.on("touchstart",(e,pile=this)=>{
+            console.debug("touchstart");
             selection.dragstart(pile,e);
             e.preventDefault();
         });
