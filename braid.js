@@ -141,7 +141,8 @@ let selection = new class {
         this.unhighlight();
         this.card = pile.remove();
         let duh = this.card.$w[0].getBoundingClientRect();
-        this.shift = {x:duh.left-e.clientX, y:duh.top-e.clientY};
+        let co = GetCoords(e);
+        this.shift = {x:duh.left - co.x, y:duh.top - co.y};
         console.debug("shift=",this.shift);
         this.card.$w.addClass("dragging");
         this.source = pile;
@@ -230,7 +231,6 @@ class Card {
         }
     }
     move(x,y) {
-        console.debug("Moving card %s to",this.str(),coords(x,y));
         this.$w.css(
             coords(x,y)
         );
@@ -794,7 +794,7 @@ function init() {
     braid.output();
     IsDone();
     $("#rules").on("click",()=>{$("#popup").toggle();});
-    console.log("=====READY5=====");
+    console.log("=====READY7=====");
     
 }
 
