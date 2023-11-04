@@ -169,6 +169,7 @@ let selection = new class {
     dragmove(e,buttondown) {
         this.moved = true;
         let co = GetCoords(e);
+        console.debug("co=",co);
         if (buttondown && this.card) {
             this.card.move(co.x + this.shift.x,
                            co.y + this.shift.y);
@@ -186,7 +187,10 @@ let selection = new class {
 };
 
 function GetCoords(e) {
+    console.debug("GetCoords");
+    console.debug("e=",e);
     let ct = e.changedTouches;
+    console.debug("ct=",ct);
     if (ct) {
         return {x:ct[0].pageX,y:ct[0].pageY};
     } else {
@@ -794,7 +798,7 @@ function init() {
     braid.output();
     IsDone();
     $("#rules").on("click",()=>{$("#popup").toggle();});
-    console.log("=====READY2=====");
+    console.log("=====READY3=====");
     
 }
 
