@@ -113,10 +113,21 @@ body {
     display: grid;
     justify-content: end;
     position: relative;
-    grid-template-columns: 20vh 1fr;
+    grid-template-columns: 20vh 1fr 3ex;
     column-gap: 1vh;
-    grid-template-rows: 1fr 1fr;
+    grid-template-rows: 1fr 1fr 2ex;
     width: 45%;
+}
+.count {
+    color: white;
+}
+#discardcount {
+    grid-column: 3;
+    grid-row: 1;
+}
+#flipcount {
+    grid-column: 3;
+    grid-row: 3;
 }
 #mid {
     display: flex;
@@ -262,6 +273,7 @@ body {
 
 .foundation .overlay.done {
     opacity: 50%;
+    background-color: gray;
 }
 #buttons {
     display: flex;
@@ -348,15 +360,20 @@ body {
 #rules {
     position: absolute;
     cursor: pointer;
-    top:  38vh;
+    /*top:  38vh;*/
+    bottom: 40vh;
     left: 1vw;
+    bottom: 40vh;
+    width: 20vw;
     padding: 5px;
     font-size: 10vmin;
     z-index: 0;
     
 }
 #rules>img {
-    height: 20vmin;
+    bottom: 40vh;
+    width: 20vw;
+    /*height: 20vmin;*/
     opacity: 0.5;
 }
 #popup {
