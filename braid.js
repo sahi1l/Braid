@@ -17,8 +17,8 @@ let docks = {};
 let free = [];
 
 let suits = {"H":"&hearts;",
-             "D":"&diams;",
-             "S":"&spades;",
+//             "D":"&diams;",
+//             "S":"&spades;",
              "C":"&clubs;"};
 let colors = {"H": "red",
               "D": "#A00",
@@ -71,6 +71,7 @@ let Undo = new class {
         //dir is the direction of the foundation: -1,0,1
         braidQ = (source instanceof Dock);
         this.stack.push([source,target,braidQ]); //braidQ if the undo involves moving a card from source back to the braid
+        this.rstack= [];
         this.setbuttons();
         /*this.output();*/
     }
@@ -105,7 +106,9 @@ let Undo = new class {
             source.flip();
         } else {
             target.add(source.remove());
-            source.add(braid.remove());
+            if (source instanceof Dock) {
+                source.add(braid.remove());
+            }
         }
         this.stack.push([source,target]);
         SetDirection();
@@ -243,7 +246,7 @@ class Card {
 function makedeck() {
     let cards = [];
     for (let n = 1; n<=Ndecks; n++) {
-        for (let suit of "DHCS") {
+        for (let suit of Object.keys(suits)) {
             for (let val of values) {
                 let pos = randint(0,cards.length+1); //because you can insert cards at the end too
                 cards.splice(pos, 0, new Card($root,suit,val)); //inserts randomly
@@ -309,6 +312,7 @@ class Pile {
     update() {
     }
     add(card) {
+        if(!card) {return;}
         this.stack.push(card);
         let n = this.stack.length;
         card.$w.css({"z-index":100 + n});
@@ -664,20 +668,26 @@ class Foundation extends DragIn {
     constructor($root,suit,start) {
         super($root,0,0);
         this.$w.addClass("foundation");
-        this.$w.html(start+suits[suit]);
+        this.$display = $("<span>").appendTo(this.$w);
+        this.$display.html(start+suits[suit]);
         this.suit = suit;
         this.start = start;
         this.$overlay.on("mousedown",this.highlightNext);
         this.$overlay.on("mouseup",this.unhighlightNext);
         this.$overlay.appendTo(this.$w);
     }
+    full() {
+        let isfull = this.stack.length == values.length;
+        this.$overlay.toggleClass("done",isfull);
+        return isfull;
+    }
     reset(start) {
         super.reset();
         if (start) {
             this.start = start;
-            this.$w.html(this.start+suits[this.suit]);
+            this.$display.html(this.start+suits[this.suit]);
         } else {
-            this.$w.html("");
+            this.$display.html("");
         }
     }
     highlightNext() {
@@ -700,6 +710,9 @@ class Foundation extends DragIn {
             DEBUG(`suit doesn't match: ${card.suit} != ${this.suit}`);
             return false;
         }
+        if (this.full()) {
+            return false;
+        }
         if (this.stack.length==0) {
             DEBUG(`stack is empty: ${card.value}, ${this.start}`);
             return card.value == this.start;
@@ -707,7 +720,6 @@ class Foundation extends DragIn {
         let a = values.indexOf(this.top().value);
         let b = values.indexOf(card.value);
         let dir = Compare(this.top(), card);
-        console.debug(this.top().value,card.value,a,b,dir,foundation.direction);
         if (dir==0) {return false;}
         if (dir*foundation.direction==1) {return true;}
         if(foundation.direction == 0) {
@@ -715,32 +727,35 @@ class Foundation extends DragIn {
         }
         return false;
     }
-    doneQ() {
+/*    doneQ() {
         if (Compare(foundation, this.top()) * foundation.direction == -1) {
             this.$overlay.addClass("done");
         } else {
             this.$overlay.removeClass("done")
         }
         CheckWin()
-    }
+        }
+*/
     add(source, target) {
         super.add(source,target);
-        this.doneQ();
+        this.full();
     }
     remove() {
         let result = super.remove();
-        this.doneQ();
+        this.full();
         return result;
     }
 }
 function CheckWin() {
     let total = 0;
-    let result = [];
+    let result = true;
     for (let key of foundation.keys) {
-        result.push(key+":"+foundation[key].stack.length);
-            total += foundation[key].stack.length;
+        let isFull = foundation[key].full();
+        console.debug(key,isFull);
+        result = result & isFull;
     }
-    $("#win").toggleClass("win",total==104);
+    if(result) {console.log("WINNER");}
+    $("#win").toggleClass("win",result);
 }
 function IsDone() {
     CheckWin();
