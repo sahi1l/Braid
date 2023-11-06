@@ -1,28 +1,24 @@
-* DONE The card is a bit offset from the mouse pointer which makes things confusing
-* There's probably a lot of dead code to clear out
+* DONE Add a #win message
+* DONE Add a function that runs at the end of each "move", which...
 * DONE Add restart button (but protect it)
+* DONE Auto should not move from the free pile if there is a matching card in the docks.
+* DONE BUG: When you start a new game, some cards don't go onto the foundation. Need to check the OK coding.
+* DONE Change auto icon from eyeball to something that implies "automove"
+* DONE Disable the undo/redo buttons when those stacks are empty
+* DONE Move Auto button into the talondeck and use grid to do a more even split
+* DONE Move the "River" text down, so it is at the bottom of the braid background
+* DONE Option to reverse left and right
+* DONE Redo is occasionally moving cards off of Braid for no reason
+* DONE Shift talon over and put available button next to it
 * DONE Show the number of cards in the Discard pile
 * DONE Show the number of times the talon has been redone
-* DONE Shift talon over and put available button next to it
-* TODO Add a #win message
-** It might work if an error isn't thrown earlier, double-check
-** This only happened once
-** Touch might need a little debugging
-* Add a function that runs at the end of each "move", which...
-** Checks for a win: CheckWin
-** Adjusts cards: adjustPositions
-** Unhighlights everything (or fixes the highlighting, anyway): selection.unhighlight()
+* DONE The card is a bit offset from the mouse pointer which makes things confusing
 * DONE add a help button
-* DONE Move the "River" text down, so it is at the bottom of the braid background
-* DONE Change auto icon from eyeball to something that implies "automove"
-* Option to have available turned on automatically, after every play
-** Possibly without the automatic thingy
+* TODO Clicking on a discard card adds it to a spare free pile if it can't go onto the foundation
+* TODO Move Popup outside of #canvas so it can appear above the cards
 * Add the ability to add "snapshots" to the Undo stack, so that you can rewind back to certain points
-* Clicking on a discard card adds it to a spare free pile if it can't go onto the foundation
-* DONE Option to reverse left and right
-* DONE Auto should not move from the free pile if there is a matching card in the docks.
-* DONE Move Auto button into the talondeck and use grid to do a more even split
-* The highlight doesn't disappear as often as it should
-* BUG: Pushing redo at the end of the stack moved cards from the braid to the discard???
-* DONE BUG: When you start a new game, some cards don't go onto the foundation. Need to check the OK coding.
-* DONE Disable the undo/redo buttons when those stacks are empty
+* TODO Color "root" cards slightly different
+* Option to have available turned on automatically, after every play, maybe without automatic
+* Run IsDone after every automove (this might fix lingering highlights)
+** The highlight doesn't disappear as often as it should
+
