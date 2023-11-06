@@ -6,53 +6,68 @@
 <script type=module src="braid.js"></script>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
 <link rel="stylesheet" href="braid.css">
-<div id="canvas">
+<main id="canvas">
+  
   <div id="left">
     <div id="braid">
+      <img src="braidback.png" class="braidbg">
     </div braid>
     <div id="dock">
+      <div class="label">Docks</div>
     </div dock>
     <div id="free">
+      <div class="label">Free</div>
     </div free>
+
+    <div id="rules">
+      <img src="title.png">
+      <div id="popup">
+        <h2>Rules of the Card Game <I>River</I></h2>
+        <I>More commonly called <A HREF="https://en.wikipedia.org/wiki/Herring-Bone_(card_game)">Herringbone</A> or Braid." Played with 2 52-card decks.</I>
+        <UL>
+          <LI><B>Goal:</B> Build up the eight wrap-around foundations by suit.  You can play a card to the foundation by clicking on it or dragging it to the appropriate spot.</li>
+          <li>The foundations can all be built upward or downward; a blue arrow appears once you've played a card on a foundation other than the initial rank, showing the direction to build.
+          <LI>The top of the <B>discard</B> pile can be played to the foundation or to an empty <B>free</B> space.</LI>
+          <LI>Clicking on the <B>deck</B> will add a new card to the <B>discard</B>.  The deck can be flipped over as often as needed (for now).</LI>
+          <LI>A card in a <B>free</B> or <B>dock</B> space can be played to the <B>foundation</B>.</LI>
+          <LI>When a <B>dock</B> space is empty, it is filled by the last card in the <B>river</B>.  Once the river is empty, <B>dock</B> spaces act as <B>free</B> spaces.</LI>
+          <li>The <img src="icons/available.png"> button automatically moves cards to the foundation if doing so would not eliminate a choice for the player; otherwise the cards that could be moved are highlighted with a red border.</li>
+          <li>The <img src="icons/undo.png"> and <img src="icons/redo.png"> buttons provide unlimited undo and redo.</li>
+        </UL>    
+      </div popup>
+</div rules>
+
   </div left>
 
-  <div id="right">
+<div id="right">
+    
     <div id="foundations">
+      <div class="label">Foundations</div>
       <div id="direction"></div>
     </div foundations>
-    <div id="mid">
+    
+    <div id="talonbox">
       <button id="available"></button>
-      <div id="talonbox">
+      <!--      <div id="talonbox">-->
+        <div id="taloncount" class="count">0</div>
         <div id="discardcount" class="count">0</div>
-        <div id="flipcount" class="count">0</div>
-      </div>
-    </div>
+<!--      </div>-->
+    </div mid>
+    
     <div id="buttons">
-      <button id="undo"></button>
-      <button id="redo"></button>
+      <label for="undo"><button id="undo"></button><span>Undo</span></label>
+      <label for="redo"><button id="redo"></button>      <span>Redo   </span></label>
+      <label for="help"><button id="help"></button>      <span>Help   </span></label>
+      <label for="reverse"><button class="smallbutton" id="reverse"></button></label>
+      <label for="restart"><button class="smallbutton" id="restart"></button><span>Restart</span></label>
+      <label for="newgame"><button class="smallbutton" id="newgame"></button><span>New    </span></label>
       <!--<button id="restart">Restart</button>-->
-      </div>
+    </div>
+    
   </div right>
-</div>
+
+</main>
+
 <div id="win">
   Win!
-</div>
-<div class="help" id="freehelp">Free</div>
-<div class="help" id="dockshelp">Docks</div>
-<div class="help" id="foundationhelp">Foundation</div>
-<div id="rules">
-  <img src="title.png">
-  <div id="popup">
-    <h2>Rules of the Card Game <I>River</I></h2>
-<I>More commonly called <A HREF="https://en.wikipedia.org/wiki/Herring-Bone_(card_game)">Herringbone</A> or Braid." Played with 2 52-card decks.</I>
-    <UL>
-      <LI><B>Goal:</B> Build up the eight wrap-around foundations by suit.  You can play a card to the foundation by clicking on it or dragging it to the appropriate spot.</li>
-      <li>The foundations can all be built upward or downward; a blue arrow appears once you've played a card on a foundation other than the initial rank, showing the direction to build.
-      <LI>The top of the <B>discard</B> pile can be played to the foundation or to an empty <B>free</B> space.</LI>
-      <LI>Clicking on the <B>deck</B> will add a new card to the <B>discard</B>.  The deck can be flipped over as often as needed (for now).</LI>
-      <LI>A card in a <B>free</B> or <B>dock</B> space can be played to the <B>foundation</B>.</LI>
-      <LI>When a <B>dock</B> space is empty, it is filled by the last card in the <B>river</B>.  Once the river is empty, <B>dock</B> spaces act as <B>free</B> spaces.</LI>
-      <li>The <img src="icons/available.png"> button automatically moves cards to the foundation if doing so would not eliminate a choice for the player; otherwise the cards that could be moved are highlighted with a red border.</li>
-      <li>The <img src="icons/undo.png"> and <img src="icons/redo.png"> buttons provide unlimited undo and redo.</li>
-</UL>    
 </div>

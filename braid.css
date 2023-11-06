@@ -4,11 +4,6 @@ html,body {
     height: 100%;
     overflow: hidden;
 }    
-body {
-    display: flex;
-    flex-direction: row;
-    background-color: green;
-}
 #canvas {
     background-color: green;
     display: flex;
@@ -20,164 +15,152 @@ body {
     position:relative;
     z-index: 0;
 }
+#canvas.reverse {
+    flex-direction:row-reverse;
+}
 #left,#right {
     display:inline-block;
     position: relative;
 }
+/*LEFT========================================*/
 #left {
-    /*width: 264px;*/
+    display: grid;
+    grid-template-rows: 60vh 15vh 25vh;
     width: 68.75vw;
 }
+#braid {
+    grid-row: 1;
+    width: 100%;
+    position: absolute;
+    height: 60vh;
+    z-index: 2;
+}
+#free,#dock {
+    position: relative;
+    display: grid;
+    justify-content: space-evenly;
+}
+#free {
+    grid-row: 3;
+    grid-template-columns: repeat(4,1fr);
+    grid-template-rows: 1fr 1fr;
+    position: absolute;
+    width: 80%;
+}
+
+#dock {
+    grid-row: 2;
+    grid-template-columns: repeat(5,1fr);
+    grid-template-rows: 1fr;
+    left: 0px;
+    margin-bottom: 5vh;
+    background: linear-gradient(0deg, blue 0%, cyan 50%, blue 100%);
+    background-size: cover;
+}
+.label {
+    position:absolute;
+    width: 100%;
+    text-align: center;
+    margin: auto;
+    font-family: sans-serif;
+    font-size: 5vmin;
+    color: rgba(255,255,255,0.5);
+}
+#dock .label {bottom: 100%;}
+#free .label {top: 100%;}
+
+/*RIGHT========================================*/
 #right {
     margin-left: 0.25vw;
-    /*min-width: 100px;*/
     width: 28vw;
     display: flex;
     flex-direction: column;
-    
 }
 
-.card,.pile {
-    position: absolute;
-    width: 12vw;/*10vmin;*/
-    height: 8.3vh; /*6.67vmin;*/
-    margin: 3px;
-    text-align: center;
-    user-select: none;
-    font-size: 6.5vmin; /*5.33vmin;*/
-}
-/*.card>.bottom {
-    margin:0px;
-    position:absolute;
-    bottom: 0px;
-    width: 100%;
-    text-align: center;
-    padding:0px;
-    background-color: white;
-    overflow: clip;
-}*/
-.card {
-    background-color: white;
-    border: 1px solid black;
-    top: 0px;
-    left: 0px;
-    cursor: pointer;
-    transition: top 0.2s, left 0.2s;
-    pointer-events: none;
-}
-.card.braidcard {
-    transition: top 1s, left 1s;
-}
-/*.back {
-    background-size: cover;
-    border: 2px solid white;
-    width: 100%;
-    height: 100%;
-    position: absolute;
-    top: 0px;
-    left: 0px;
-    cursor: pointer;
+/*MID----------------------------------------*/
+/*#mid {
+    display: flex;
+    flex-direction: row;
+    justify-content: end;
+    margin-top: 7vh;
 }
 */
+:root {--cardwidth: 12vw;
+       --cardheight: 9vh;
+       --btnsize: 10vmin;
+      }
+
+#talonbox {
+    display: grid;
+    justify-content: center;
+    align-content: center;
+    position: relative;
+    grid-template-columns: 12vw var(--cardwidth) 3ex;
+    grid-template-rows: 1fr 1fr 2ex;
+    grid-column-gap: 1ex;
+    border-top: 3px solid white;
+    margin-top: 5px;
+    padding-top: 5px;
+    
+}
 .talon>.overlay
 {
     background: url("cardback.png");
     background-size: cover;
     color: white;
     overflow: clip;
-    
-
+    display: flex;
+    align-content: center;
+    justify-content: center;
 }
-.pile {
-    border: 1px solid white;
-    color: white;
-    background-color: rgba(255,255,255,0.1);
+.talon > .overlay.empty {
+    opacity: 0.1;
+/*    background: rgba(255,255,255,0.2);*/
+    border: 2px white;
 }
-
-.overlay {
-    width: 100%;
-    height: 100%;
-    background-color: rgba(255,255,255,0.01);
+.talon > .overlay > span {
+    font-size: 8vmin;
     color: rgba(255,255,255,0.5);
-    z-index: 2000; /*when facedown,put on top*/
-    position: absolute;
-    top: 0px;
-    left: 0px;
-    font-family: sans-serif;
-    font-size: 3vmin;
-    overflow: clip;
-
-}
-
-#talonbox {
-    display: grid;
-    justify-content: end;
-    position: relative;
-    grid-template-columns: 20vh 1fr 3ex;
-    column-gap: 1vh;
-    grid-template-rows: 1fr 1fr 2ex;
-    width: 45%;
 }
 .count {
     color: white;
+    justify-self: end;
+    align-self: center;
+    padding-left: 1ex;
+}
+#taloncount {
+    grid-column: 3;
+    grid-row: 2;
 }
 #discardcount {
     grid-column: 3;
     grid-row: 1;
 }
 #flipcount {
-    grid-column: 3;
+    grid-column: 2;
     grid-row: 3;
+    justify-self: center;
 }
-#mid {
-    display: flex;
-    flex-direction: row;
-    justify-content: end;
-    margin-top: 7vh;
+#flipcount::before {
+    content: "Flips: ";
+}
+#flipcount:empty {
+    display: none;
 }
 #talonbox>.pile {grid-column: 2;}
+
 #available {
+    grid-column: 1;
+    grid-row: 1/3;
     display: inline-block;
+    align-self: center;
+    justify-self: center;
     background: url("icons/available.png");
     background-size: cover;
-    width: 12vmin;
-    height: 12vmin;
-    margin-right: 3vw;
+    width: 16vmin;
+    height: 16vmin;
 }
 
-#talonbox .card,
-#talonbox .pile,
-#free .card,
-#free .pile,
-#dock .card,
-#dock .pile,
-#foundations .card,
-#foundations .pile 
-{
-    position: relative;
-}
-#free,#dock {
-    position: relative;
-    display:grid;
-    justify-content: space-evenly;
-}
-#free {grid-template-columns: repeat(4,1fr);}
-#dock {grid-template-columns: repeat(5,1fr);}
-#free {
-    grid-template-rows: 1fr 1fr;
-    position: absolute;
-    left: 0px;
-    top: 75vh;
-}
-#dock {
-    left: 0px;
-    top: 60vh;
-    background: linear-gradient(0deg, blue 0%, cyan 50%, blue 100%);
-    background-size: cover;
-    grid-template-rows: 1fr;
-    margin-bottom: 5vh;
-    
-}
 .talon > .overlay {
     opacity: 100%;
     background-color: blue;
@@ -185,6 +168,7 @@ body {
     padding-bottom:2px;
     margin:0px;
 }
+
 .pile.hover {
     border: 4px solid yellow;
     margin: 0px;
@@ -202,20 +186,13 @@ body {
     background: transparent;
     border: transparent;
 }
-#braid {
-    height: 58.3vh; /*200px;*/
-    width: 68.75vw; /*265px;*/
-    position: absolute;
-    top: 0px;
-    left: 0px;
-    z-index: 2;
-}
-
+/*
 #braid .card, #braid .pile {
     width: 10.6vw;
-    height: 7.77vh;
+    height: 8vh;
     position:relative;
 }
+*/
 .card {
     display: flex;
     justify-content: center;
@@ -278,47 +255,59 @@ body {
 #buttons {
     display: flex;
     margin-top: 5vh;
-    
     flex-direction: row;
     flex-wrap: wrap;
     justify-content: center;
-    width: 18vw;
+    width: 100%;
+    
 }
+
 #buttons button {
-    width: 12vmin;
-    height: 12vmin;
+    width: var(--btnsize);
+    height: var(--btnsize);
     border-radius: 10px;
     background-size: cover;
     margin: 1vmin;
-}
-#undo {
-    background: url("icons/undo.png");
     background-size: cover;
 }
-#redo {
-    background: url("icons/redo.png");
-    background-size: cover;
+#buttons label span {
+    position:absolute;
+    bottom: 50%;
+    left: 0%;
+    text-align:center;
+    display: block;
+    width: 100%;
+    color: white;
+    display: none;
 }
-
-.tooltip {/*apply this class to the object that receives the tip*/
+#buttons label {
     position: relative;
 }
-.tooltip .tttext {
-    visibility: hidden;
-    width: 120px;
-    background-color: black;
-    color: white;
-    text-align: center;
-    padding: 5px 0;
-    border-radius: 6px;
-    position: absolute;
-    z-index: 0;
+/*#buttons button+label {
+    font-size: 3vmin;
+    position: relative;
+    left: -12%;
+    bottom: -50%;
+}*/
+#undo {background: url("icons/undo.png");}
+#redo {background: url("icons/redo.png");}
+#undo.empty {
+    opacity: 0.5;
 }
-.tooltip:hover .tttext {
-    visibility: visible;
-    z-index: 5000;
+#redo.empty {
+    opacity: 0.5;
 }
+#help {background: url("icons/help.png");}
+#restart {background: url("icons/restart.png");}
+#newgame {background: url("icons/newgame.png");}
+#reverse {background: url("icons/reverse.png");}
 
+#buttons .smallbutton {
+    width: calc(0.8 * var(--btnsize));
+    height: calc(0.8 * var(--btnsize));
+    margin: calc(0.1 * var(--btnsize));
+}
+    
 #win {
     font-size: 50vw;
     text-align: center;
@@ -331,32 +320,70 @@ body {
     font-weight: bold;
     display: none;
 }
-.help {
-    font-family: sans-serif;
-    font-size: 5vmin;
-    color: rgba(255,255,255,0.5);
-    position: absolute;
-    top: 50vh;
-    left: 50vw;
-    text-align: center;
-}
-.help#freehelp {
-    top: 95vh;
-    left: 22.5vw;
-}
-.help#dockshelp {
-    top: 55vh;
-    left: 31.5vw;
-}
-.help#braidhelp {
-    top: 40vh;
-    left: 10vw;
-}
-.help#foundationhelp {
-    top: 13vh;
-    right: 14vw;
+
+#foundations .label {
+    left: -22%;
+    top: 45%;
+    width: auto;
     transform: rotate(-90deg);
 }
+/*GENERAL========================================*/
+.card,.pile {
+    position: absolute;
+    width: var(--cardwidth);/*10vmin;*/
+    height: var(--cardheight); /*6.67vmin;*/
+    margin: 3px;
+    text-align: center;
+    user-select: none;
+    font-size: 6.5vmin; /*5.33vmin;*/
+}
+.card {
+    background-color: white;
+    border: 1px solid black;
+    top: 0px;
+    left: 0px;
+    cursor: pointer;
+    transition: top 0.2s, left 0.2s;
+    pointer-events: none;
+}
+.pile {
+    border: 1px solid white;
+    color: white;
+    background-color: rgba(255,255,255,0.1);
+}
+.card.braidcard {
+    transition: top 1s, left 1s;
+}
+#talonbox .card,
+#talonbox .pile,
+#free .card,
+#free .pile,
+#dock .card,
+#dock .pile,
+#foundations .card,
+#foundations .pile 
+{
+    position: relative;
+}
+
+.overlay {
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255,255,255,0.01);
+    color: rgba(255,255,255,0.5);
+    z-index: 2000; /*when facedown,put on top*/
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    font-family: sans-serif;
+    font-size: 3vmin;
+    overflow: clip;
+}
+
+
+
+
+/*RULES===================================*/
 #rules {
     position: absolute;
     cursor: pointer;
