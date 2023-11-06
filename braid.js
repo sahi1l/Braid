@@ -17,8 +17,8 @@ let docks = {};
 let free = [];
 
 let suits = {"H":"&hearts;",
-//             "D":"&diams;",
-//             "S":"&spades;",
+             "D":"&diams;",
+             "S":"&spades;",
              "C":"&clubs;"};
 let colors = {"H": "red",
               "D": "#A00",
