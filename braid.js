@@ -751,11 +751,11 @@ function CheckWin() {
     let result = true;
     for (let key of foundation.keys) {
         let isFull = foundation[key].full();
-        console.debug(key,isFull);
-        result = result & isFull;
+        result = result && isFull;
     }
-    if(result) {console.log("WINNER");}
-    $("#win").toggleClass("win",result);
+    if(result) {console.log("WINNER");
+                $("#win").addClass("win");
+               }
 }
 function IsDone() {
     CheckWin();
@@ -809,6 +809,7 @@ function Reset() {
     talon.reset();
     discard.reset();
     Undo.reset();
+    $("#win").removeClass("win");
 }
 function NewGame() {
     if (confirm("Start a new game?")) {
