@@ -551,7 +551,7 @@ function GetAvailable() {//UI
             }
         }
     }
-    if(movedFlag) {setTimeout(GetAvailable,200);}
+    if(movedFlag) {setTimeout(GetAvailable,200);} else {IsDone();}
 }
 class Discard extends DragOut {
     constructor($root) {
