@@ -15,7 +15,7 @@
 * DONE The card is a bit offset from the mouse pointer which makes things confusing
 * DONE add a help button
 * TODO Clicking on a discard card adds it to a spare free pile if it can't go onto the foundation
-* TODO Move Popup outside of #canvas so it can appear above the cards
+* DONE Move Popup outside of #canvas so it can appear above the cards
 * Add the ability to add "snapshots" to the Undo stack, so that you can rewind back to certain points
 * TODO Color "root" cards slightly different
 * Option to have available turned on automatically, after every play, maybe without automatic

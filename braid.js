@@ -6,6 +6,7 @@ function DEBUG(text) {
 }
 let $root;
 let lefthanded = false;
+let automatic = false;
 let foundation = {};
 let talon;
 let discard;
@@ -140,7 +141,7 @@ let selection = new class {
         this.clear();
     }
     dragstart(pile,e) {
-        this.unhighlight();
+        Interact();
         this.card = pile.remove();
         let duh = this.card.$w[0].getBoundingClientRect();
         let co = GetCoords(e);
@@ -346,9 +347,11 @@ class Talon extends Pile {
             }
         }
         this.$overlay.on("click",() => {//UI
+            Interact();
             if(this.flip()) {
                 Undo.add(this,"flip");
             }
+            if(automatic) {setTimeout(GetAvailable,300);}
         }
                         );
         this.times=1;
@@ -481,6 +484,7 @@ class DragOut extends Pile {
             sources.push(this);
         }
         this.$overlay.on("click",(e,pile=this)=>{//UI
+            Interact();
             if (AutoMoveToFoundation(pile,pile.top())) {
                 pile.remove();
                 IsDone();
@@ -551,7 +555,8 @@ function GetAvailable() {//UI
             }
         }
     }
-    if(movedFlag) {setTimeout(GetAvailable,200);} else {IsDone();}
+    if(movedFlag) {setTimeout(GetAvailable,200);}
+     else {IsDone();} 
 }
 class Discard extends DragOut {
     constructor($root) {
@@ -683,9 +688,14 @@ class Foundation extends DragIn {
     }
     reset(start) {
         super.reset();
+        $(".card").removeClass("root");
         if (start) {
             this.start = start;
             this.$display.html(this.start+suits[this.suit]);
+            for(let suit of Object.keys(suits)) {
+                $(`.card${this.start}${suit}`).addClass("root");
+            }
+            
         } else {
             this.$display.html("");
         }
@@ -757,9 +767,12 @@ function CheckWin() {
                 $("#win").addClass("win");
                }
 }
+function Interact() {
+    //called anytime the player interacts with the field
+    selection.unhighlight();
+}
 function IsDone() {
     CheckWin();
-    selection.unhighlight();
     adjustPositions();
     SetDirection();
     talon.update();
@@ -799,6 +812,7 @@ function Setup(cards) {
 }
 
 function Reset() {
+    $(".card").removeClass("root");
     braid.reset();
     for (let i=0; i<Ndocks; i++) {docks[i].reset();}
     for (let pile of free) {pile.reset();}
@@ -874,9 +888,16 @@ function init() {
     let cards = makedeck($root);
     Setup(cards);
     //BUTTONS--------------------
-    let $avail = $("#available").on("click",(e)=>{GetAvailable()});//UI
-    let $undo = $("#undo").on("click",Undo.undo);
-    let $redo = $("#redo").on("click",(e)=>{Undo.redo()});
+    let $avail = $("#available").on("click",(e)=>{
+        Interact();
+        GetAvailable()});//UI
+    $avail.on("dblclick",(e)=>{
+        automatic = !automatic;
+        $("#available").toggleClass("automatic",automatic);
+        
+    });
+    let $undo = $("#undo").on("click",(e)=>{Interact();Undo.undo(e)});
+    let $redo = $("#redo").on("click",(e)=>{Interact();Undo.redo()});
     let $newgame = $("#newgame").on("click",NewGame);
     let $restart = $("#restart").on("click",Restart);
     let $reverse = $("#reverse").on("click",(e) => {
@@ -887,8 +908,9 @@ function init() {
     IsDone();
     $("#rules").on("click",()=>{$("#popup").toggle();});
     $("#help").on("click",()=>{$("#popup").toggle();});
+    $("#popup").on("click",()=>{$("#popup").toggle();});
     console.debug(FindCards("A","D"));
-    console.log("=====READY7=====");
+    console.log("=====READY=====");
     
 }
 

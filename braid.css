@@ -12,8 +12,6 @@ html,body {
     width: 100vw;
     height: 100vh;
     aspect-ratio: 1;
-    position:relative;
-    z-index: 0;
 }
 #canvas.reverse {
     flex-direction:row-reverse;
@@ -31,14 +29,13 @@ html,body {
 #braid {
     grid-row: 1;
     width: 100%;
-    position: absolute;
+//    position: absolute;
     height: 60vh;
-    z-index: 2;
 }
 #free,#dock {
-    position: relative;
     display: grid;
     justify-content: space-evenly;
+    position: relative;
 }
 #free {
     grid-row: 3;
@@ -112,6 +109,7 @@ html,body {
     display: flex;
     align-content: center;
     justify-content: center;
+    z-index:2000;
 }
 .talon > .overlay.empty {
     opacity: 0.1;
@@ -160,6 +158,9 @@ html,body {
     width: 16vmin;
     height: 16vmin;
 }
+#available.automatic {
+    filter: invert();
+}
 
 .talon > .overlay {
     opacity: 100%;
@@ -197,6 +198,9 @@ html,body {
     display: flex;
     justify-content: center;
     align-items: center;
+}
+.card.root {
+    background-color: antiquewhite;
 }
 .card.braidcard {
     display: flex;
@@ -387,23 +391,19 @@ html,body {
 
 /*RULES===================================*/
 #rules {
-    position: absolute;
-    cursor: pointer;
+    /*height: 20vmin;*/
     /*top:  38vh;*/
     bottom: 40vh;
-    left: 1vw;
-    bottom: 40vh;
-    width: 20vw;
-    padding: 5px;
     font-size: 10vmin;
-    z-index: 0;
-    
-}
-#rules>img {
-    bottom: 40vh;
-    width: 20vw;
-    /*height: 20vmin;*/
+    left: 1vw;
     opacity: 0.5;
+    padding: 5px;
+    position: absolute;
+    width: 200vmin;
+    height: 100vmin;
+    max-width: 25vw;
+    max-height: 20vh;
+    aspect-ratio: 2;
 }
 #popup {
     border: 4px solid black;
