@@ -186,8 +186,9 @@ let selection = new class {
         let dist = Math.hypot(co.x-this.startco.x,co.y-this.startco.y);
         console.debug("dist=",dist);
         if ( dist < 10) {
+            let source = this.source;
             this.reject();
-            this.source.click();
+            source.click();
             return "click";
         }
 
