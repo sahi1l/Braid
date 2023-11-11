@@ -168,6 +168,7 @@ let selection = new class {
         this.clear();
     }
     dragstart(pile,e) {
+        console.debug("dragstart");
         Interact();
         this.card = pile.remove();
         let duh = this.card.$w[0].getBoundingClientRect();
@@ -178,10 +179,13 @@ let selection = new class {
         this.source = pile;
     }
     dragend(e) {//UI
+        console.debug("dragend");
         if(!this.card) {return "";}
         this.card.$w.removeClass("dragging");
         let co = GetCoords(e);
-        if (Math.hypot(co.x-this.startco.x,co.y-this.startco.y) < 10) {
+        let dist = Math.hypot(co.x-this.startco.x,co.y-this.startco.y);
+        console.debug("dist=",dist);
+        if ( dist < 10) {
             this.reject();
             this.source.click();
             return "click";
@@ -527,8 +531,8 @@ class DragOut extends Pile {
             selection.dragstart(pile,e);
             e.preventDefault();
         });
-        this.$overlay.on("touchend",(e,pile=this)=>{
-            e.preventDefault();
+        this.$overlay.on("touchend",(e)=>{
+            selection.dragend(e);
         });
     }
     click(pile) {
