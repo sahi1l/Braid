@@ -172,13 +172,21 @@ let selection = new class {
         this.card = pile.remove();
         let duh = this.card.$w[0].getBoundingClientRect();
         let co = GetCoords(e);
+        this.startco = co;
         this.shift = {x:duh.left - co.x, y:duh.top - co.y};
         this.card.$w.addClass("dragging");
         this.source = pile;
     }
     dragend(e) {//UI
-        if(!this.card) {return;}
+        if(!this.card) {return "";}
         this.card.$w.removeClass("dragging");
+        let co = GetCoords(e);
+        if (Math.hypot(co.x-this.startco.x,co.y-this.startco.y) < 10) {
+            this.reject();
+            this.source.click();
+            return "click";
+        }
+
         if(!this.moved) {
             if (! AutoMoveToFoundation(this.source,this.card)) {
                 this.source.add(this.card);//restore to the original pile
@@ -192,6 +200,7 @@ let selection = new class {
         this.clear();
         IsDone();
         e.preventDefault();
+        return "";
     }
     dragmove(e,buttondown) {
         this.moved = true;
@@ -514,18 +523,11 @@ class DragOut extends Pile {
         this.$overlay.on("mousemove",(e,pile=this)=>{
             if(e.buttons && !selection.card) {selection.dragstart(pile,e);}
         });
-        this.tapped = null;//meant to act as a tap 
         this.$overlay.on("touchstart",(e,pile=this)=>{
-            if (!this.tapped) {
-                this.tapped = setTimeout((pile=pile,e=e)=>{this.tapped=null;},200);
-            }
             selection.dragstart(pile,e);
             e.preventDefault();
         });
         this.$overlay.on("touchend",(e,pile=this)=>{
-            if (this.tapped) {
-                this.click(pile);
-            }
             e.preventDefault();
         });
     }
