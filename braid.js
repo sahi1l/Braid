@@ -514,8 +514,18 @@ class DragOut extends Pile {
         this.$overlay.on("mousemove",(e,pile=this)=>{
             if(e.buttons && !selection.card) {selection.dragstart(pile,e);}
         });
+        this.tapped = null;//meant to act as a tap 
         this.$overlay.on("touchstart",(e,pile=this)=>{
+            if (!this.tapped) {
+                this.tapped = setTimeout((pile=pile,e=e)=>{this.tapped=null;},200);
+            }
             selection.dragstart(pile,e);
+            e.preventDefault();
+        });
+        this.$overlay.on("touchend",(e,pile=this)=>{
+            if (this.tapped) {
+                this.click(pile);
+            }
             e.preventDefault();
         });
     }
