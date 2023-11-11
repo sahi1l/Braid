@@ -168,7 +168,6 @@ let selection = new class {
         this.clear();
     }
     dragstart(pile,e) {
-        console.debug("dragstart");
         Interact();
         this.card = pile.remove();
         let duh = this.card.$w[0].getBoundingClientRect();
@@ -179,12 +178,10 @@ let selection = new class {
         this.source = pile;
     }
     dragend(e) {//UI
-        console.debug("dragend");
         if(!this.card) {return "";}
         this.card.$w.removeClass("dragging");
         let co = GetCoords(e);
         let dist = Math.hypot(co.x-this.startco.x,co.y-this.startco.y);
-        console.debug("dist=",dist);
         if ( dist < 10) {
             let source = this.source;
             this.reject();
@@ -571,25 +568,8 @@ function GetAvailable() {//UI
                         move=true;
                     }
                     else if (foundation.direction) {
-                        console.debug("checking ",card.str());
                         let found = FindCards(card.value,card.suit);
-                        console.debug(card.pile.rank,found[0].pile.rank,found[1].pile.rank);
                         move = (card.pile.rank >= Math.max(found[0].pile.rank, found[1].pile.rank));
-/*                        found = found.filter((x)=>x!=mypile);
-                        console.debug(found);
-                        if (found.length == 0) {
-                            console.debug("matches");
-                            move=true;
-                        } else {
-                            let myidx = card.pile.rank;
-                            let twinidx = found[0].rank;
-                            move = (myidx>=twinidx);
-                            console.debug(myidx,twinidx,move);
-                            }
-*/
-                        //if (!(braid.contains(card,!(pile instanceof Dock)))) {
-                        //    move=true;
-                        //}
                     }
                     if(move) {
                         Undo.add(pile,target);
@@ -684,8 +664,10 @@ class Dock extends DragIn {
     }
     callback() {
         if(this.empty() && !Undo.active) {
-            let card = this.braid.remove();
-            if (card) {this.add(card);}
+            setTimeout((that=this)=> {
+                let card = that.braid.remove();
+                if (card) {that.add(card);}
+            },200);
         }
         if (this.stack.length==2) {
             this.braid.add(this.stack.shift());
@@ -747,7 +729,6 @@ class Foundation extends DragIn {
         this.suit = suit;
         this.start = start;
         this.$overlay.on("mousedown",this.highlightNext);
-        this.$overlay.on("mouseup",this.unhighlightNext);
         this.$overlay.appendTo(this.$w);
     }
     full() {
@@ -775,8 +756,6 @@ class Foundation extends DragIn {
                 pile.highlight();
             }
         }
-    }
-    unhighlightNext() {
     }
     getDir(){
         return Compare(this.stack[0], this.stack[1]);
@@ -806,15 +785,6 @@ class Foundation extends DragIn {
         }
         return false;
     }
-/*    doneQ() {
-        if (Compare(foundation, this.top()) * foundation.direction == -1) {
-            this.$overlay.addClass("done");
-        } else {
-            this.$overlay.removeClass("done")
-        }
-        CheckWin()
-        }
-*/
     add(source, target) {
         super.add(source,target);
         this.full();
@@ -988,7 +958,6 @@ function init() {
     if(Preferences.auto) {setTimeout(GetAvailable,500);}
     if(Preferences.left) {Reverse();}
     $("body").toggleClass("left",Preferences.left);
-    console.debug(FindCards("A","D"));
     console.log("=====READY=====");
     
 }
