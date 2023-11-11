@@ -188,7 +188,7 @@ let selection = new class {
         if ( dist < 10) {
             let source = this.source;
             this.reject();
-            source.click();
+            source.click(source);
             return "click";
         }
 
