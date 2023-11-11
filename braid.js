@@ -133,7 +133,7 @@ let selection = new class {
         this.unhighlight();
     }
     unhighlight() {
-        $(".pile.highlight").removeClass("highlight");
+        $(".highlight").removeClass("highlight");
     }
     reject() {//replaces card.returntopile
         if (this.card==null) {return;}
@@ -501,6 +501,7 @@ class DragOut extends Pile {
     }
     highlight() {
         this.$w.addClass("highlight");
+        $("#available").addClass("highlight");
     }
 }
 function GetAvailable() {//UI
@@ -902,7 +903,7 @@ function init() {
     let $restart = $("#restart").on("click",Restart);
     let $reverse = $("#reverse").on("click",(e) => {
         lefthanded = !lefthanded;
-        $root.toggleClass("reverse",lefthanded);
+        $("body").toggleClass("reverse",lefthanded);
         adjustPositions();
     });
     IsDone();
