@@ -2,7 +2,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Maumee River Solitaire</title>
-<script src="jquery.js"></script>
+  <script src="jquery.js"></script>
+  <script src="js-cookie.js"></script>
 <script type=module src="braid.js"></script>
 <link rel="icon" href="icon.png">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
@@ -62,12 +63,15 @@
     <LI>Clicking on the <B>deck</B> will add a new card to the <B>discard</B>.  The deck can be flipped over as often as needed; the number on the card back tells you the number of times you have gone through the deck.</LI>
     <LI>A card in a <B>free</B> or <B>dock</B> space can be played to the <B>foundation</B>.</LI>
     <LI>When a <B>dock</B> space is empty, it is filled by the last card in the <B>river</B>.  Once the river is empty, <B>dock</B> spaces act as <B>free</B> spaces.</LI>
-    <li>The <img src="icons/available.png"> button automatically moves cards to the foundation if doing so would not eliminate a choice for the player; otherwise the cards that could be moved are highlighted with a red border.</li>
+    <li>The <img src="icons/available.png"> button makes all safe* moves to the foundation; other cards that could be moved to the foundation are highlighted, as is the button.  Double-clicking on the button makes this run automatically every time a card is drawn.
+<p class="safe">*A card is <i>safe</i> to move if its duplicate isn't in the river or on the docks.</p>
+    </li>
     <li>The <img src="icons/undo.png"> and <img src="icons/redo.png"> buttons provide unlimited undo and redo.</li>
     <li>The <img src="icons/reverse.png"> button switches between a left-handed and right-handed layout.</li>
     <li>The <img src="icons/restart.png"> button restarts the current game.</li>
     <li>The <img src="icons/new.png"> button starts a new game.</li>
-  </UL>    
+  </UL>
+  <div class="continue">Click here to continue.</div>
 </div popup>
 
 <img src="win.png" id="win">

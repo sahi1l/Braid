@@ -5,8 +5,35 @@ function DEBUG(text) {
     }
 }
 let $root;
-let lefthanded = false;
+
+let Preferences = new class {
+    constructor() {
+        this.left = false;
+        this.auto = false;
+        this.rules = true;
+        this.load();
+        this.name = "maumee";
+    }
+    load() {
+        let num = Cookies.get("maumee")??1;
+        this.left = Boolean(num&4);
+        this.auto = Boolean(num&2);
+        this.rules = Boolean(num&1);
+    }
+    save() {
+        let code = (this.left<<2) + (this.auto<<1) + (this.rules<<0);
+        Cookies.set(this.name,code);
+    }
+    toggle(which) {
+        this[which] = !this[which];
+        this.save();
+    }
+}
+
+
 let automatic = false;
+let showrules = true;
+
 let foundation = {};
 let talon;
 let discard;
@@ -351,7 +378,7 @@ class Talon extends Pile {
             if(this.flip()) {
                 Undo.add(this,"flip");
             }
-            if(automatic) {setTimeout(GetAvailable,300);}
+            if(Preferences.auto) {setTimeout(GetAvailable,300);}
         }
                         );
         this.times=1;
@@ -467,7 +494,7 @@ class Braid extends Pile {
         else {x=3.5+0.04*(i-17);                y=i-14;  align="top";}
         let braidbox = $("#braid")[0].getBoundingClientRect();
         let X = (braidbox.left + x * 0.20*braidbox.width);
-/*        if (lefthanded) {
+/*        if (Preferences.left) {
             X = braidbox.right - x * 0.20*braidbox.width;
         }*/
         let L = [
@@ -483,14 +510,7 @@ class DragOut extends Pile {
         if (!(this instanceof Foundation)) {
             sources.push(this);
         }
-        this.$overlay.on("click",(e,pile=this)=>{//UI
-            Interact();
-            if (AutoMoveToFoundation(pile,pile.top())) {
-                pile.remove();
-                IsDone();
-                //SetDirection();
-            }
-        });
+        this.$overlay.on("click",(e,pile=this)=>{this.click(pile);});
         this.$overlay.on("mousemove",(e,pile=this)=>{
             if(e.buttons && !selection.card) {selection.dragstart(pile,e);}
         });
@@ -498,6 +518,15 @@ class DragOut extends Pile {
             selection.dragstart(pile,e);
             e.preventDefault();
         });
+    }
+    click(pile) {
+            Interact();
+            let result = AutoMoveToFoundation(pile,pile.top());
+            if (result) {
+                pile.remove();
+                IsDone();
+            }
+        return result;
     }
     highlight() {
         this.$w.addClass("highlight");
@@ -568,6 +597,28 @@ class Discard extends DragOut {
     }
     update() {
         this.$count.html(this.stack.length);
+    }
+    click(pile) {
+        if (!super.click(pile)) {
+            for (let tgt of free) {
+                if (tgt.ok()) {
+                    tgt.add(pile.remove());
+                    Undo.add(pile,tgt);
+                    IsDone();
+                    return true;
+                }
+            }
+            for (let tgt of docks) {
+                if (tgt.ok()) {
+                    tgt.add(pile.remove());
+                    Undo.add(pile,tgt);
+                    IsDone();
+                    return true;
+                }
+            }
+            return false;
+        }
+        return true;
     }
 }
 class DragIn extends DragOut {
@@ -826,8 +877,8 @@ function Reset() {
     Undo.reset();
     $("#win").removeClass("win");
 }
-function NewGame() {
-    if (confirm("Start a new game?")) {
+function NewGame(goahead=false) {
+    if (goahead || confirm("Start a new game?")) {
         Reset();
         for (let card of mycards) {card.destroy();}
         let cards = makedeck($root);
@@ -840,6 +891,10 @@ function Restart() {
         let cards = [...mycards];
         Setup(cards);
     }
+}
+function Reverse() {
+    $("body").toggleClass("reverse",Preferences.left);
+    adjustPositions();
 }
 function init() {
     $root = $("#canvas");
@@ -893,23 +948,29 @@ function init() {
         Interact();
         GetAvailable()});//UI
     $avail.on("dblclick",(e)=>{
-        automatic = !automatic;
-        $("#available").toggleClass("automatic",automatic);
+        Preferences.toggle("auto");
+        $("#available").toggleClass("automatic",Preferences.auto);
         
     });
     let $undo = $("#undo").on("click",(e)=>{Interact();Undo.undo(e)});
     let $redo = $("#redo").on("click",(e)=>{Interact();Undo.redo()});
-    let $newgame = $("#newgame").on("click",NewGame);
+    let $newgame = $("#newgame").on("click",()=>NewGame(false));
+    $("#win").on("click",()=>NewGame(true));
     let $restart = $("#restart").on("click",Restart);
     let $reverse = $("#reverse").on("click",(e) => {
-        lefthanded = !lefthanded;
-        $("body").toggleClass("reverse",lefthanded);
-        adjustPositions();
+        Preferences.toggle("left"); Reverse();
     });
     IsDone();
-    $("#rules").on("click",()=>{$("#popup").toggle();});
     $("#help").on("click",()=>{$("#popup").toggle();});
     $("#popup").on("click",()=>{$("#popup").toggle();});
+    if(Preferences.rules) {
+        $("#popup").show();
+        Preferences.toggle("rules");
+    }
+    $("#available").toggleClass("automatic",Preferences.auto);
+    if(Preferences.auto) {setTimeout(GetAvailable,500);}
+    if(Preferences.left) {Reverse();}
+    $("body").toggleClass("left",Preferences.left);
     console.debug(FindCards("A","D"));
     console.log("=====READY=====");
     
