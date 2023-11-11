@@ -41,7 +41,7 @@ let Ndocks=5;
 let Nbraid=19;
 let Nfree = 8;
 let Ndecks = 2;
-let docks = {};
+let docks = [];
 let free = [];
 
 let suits = {"H":"&hearts;",
@@ -485,6 +485,15 @@ class Braid extends Pile {
     alignment(i) {
         return this.pos(i)[2];
     }
+    restock() {
+        console.debug(docks);
+        for (let pile of docks) {
+            if (this.empty()) {return;}
+            if (pile.empty()) {
+                pile.add(this.remove());
+            }
+        }
+    }
     flow() {
         let N = this.stack.length;
         for (let i=0; i<N; i++) {
@@ -663,12 +672,12 @@ class Dock extends DragIn {
         return card;
     }
     callback() {
-        if(this.empty() && !Undo.active) {
-            setTimeout((that=this)=> {
-                let card = that.braid.remove();
-                if (card) {that.add(card);}
-            },200);
-        }
+//        if(this.empty() && !Undo.active) {
+//            setTimeout((that=this)=> {
+//                let card = that.braid.remove();
+//                if (card) {that.add(card);}
+//            },200);
+        //        }
         if (this.stack.length==2) {
             this.braid.add(this.stack.shift());
         }
@@ -811,6 +820,7 @@ function Interact() {
     selection.unhighlight();
 }
 function IsDone() {
+    braid.restock();
     CheckWin();
     adjustPositions();
     SetDirection();
