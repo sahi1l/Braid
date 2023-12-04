@@ -190,7 +190,7 @@ let selection = new class {
         }
 
         if(!this.moved) {
-            if (! AutoMoveToFoundation(this.source,this.card)) {
+            if (! MoveToFoundation(this.source,this.card)) {
                 this.source.add(this.card);//restore to the original pile
             }
         } else if (this.target && this.target.ok(this.card)) {
@@ -202,6 +202,7 @@ let selection = new class {
         this.clear();
         IsDone();
         e.preventDefault();
+        console.debug("dragend");
         return "";
     }
     dragmove(e,buttondown) {
@@ -389,7 +390,7 @@ class Talon extends Pile {
             if(this.flip()) {
                 Undo.add(this,"flip");
             }
-            if(Preferences.auto) {setTimeout(GetAvailable,300);}
+            AutoPlay(false,"wait");
         }
                         );
         this.times=1;
@@ -419,6 +420,7 @@ class Talon extends Pile {
         }
         this.$overlay.toggleClass("empty",this.empty());
         IsDone();
+        console.debug("flip");
         return true;
     }
     unflip() {
@@ -434,6 +436,7 @@ class Talon extends Pile {
         }
         this.$overlay.toggleClass("empty",this.empty());
         IsDone();
+        console.debug("unflip");
         return true;
     }
 }
@@ -486,13 +489,17 @@ class Braid extends Pile {
         return this.pos(i)[2];
     }
     restock() {
-        console.debug(docks);
+        console.debug(">restock");
+        let moved = false;
         for (let pile of docks) {
-            if (this.empty()) {return;}
+            if (this.empty()) {break;}
             if (pile.empty()) {
                 pile.add(this.remove());
+                moved = true;
             }
         }
+        if(moved) {AutoPlay(false,true);}
+        console.debug("restock");
     }
     flow() {
         let N = this.stack.length;
@@ -544,7 +551,7 @@ class DragOut extends Pile {
     }
     click(pile) {
             Interact();
-            let result = AutoMoveToFoundation(pile,pile.top());
+            let result = MoveToFoundation(pile,pile.top());
             if (result) {
                 pile.remove();
                 IsDone();
@@ -554,6 +561,15 @@ class DragOut extends Pile {
     highlight() {
         this.$w.addClass("highlight");
         $("#available").addClass("highlight");
+    }
+}
+function AutoPlay(always,after) {
+    if (Preferences.auto || always) {
+        if(after) {
+            setTimeout(GetAvailable,200);
+        } else {
+            GetAvailable();
+        }
     }
 }
 function GetAvailable() {//UI
@@ -591,8 +607,9 @@ function GetAvailable() {//UI
             }
         }
     }
-    if(movedFlag) {setTimeout(GetAvailable,200);}
-     else {IsDone();} 
+    if(movedFlag) {AutoPlay("always","wait");}
+    else {IsDone();}
+    console.debug("GetAvailable");
 }
 class Discard extends DragOut {
     constructor($root) {
@@ -605,6 +622,7 @@ class Discard extends DragOut {
         this.$count.html(this.stack.length);
     }
     click(pile) {
+        console.debug("Discard>click");
         if (!super.click(pile)) {
             for (let tgt of free) {
                 if (tgt.ok()) {
@@ -672,21 +690,17 @@ class Dock extends DragIn {
         return card;
     }
     callback() {
-//        if(this.empty() && !Undo.active) {
-//            setTimeout((that=this)=> {
-//                let card = that.braid.remove();
-//                if (card) {that.add(card);}
-//            },200);
-        //        }
         if (this.stack.length==2) {
             this.braid.add(this.stack.shift());
         }
+        console.debug("Dock.callback")
     }
 }
 
 foundation.direction = 0;
 
-function AutoMoveToFoundation(pile,card) {//UI
+function MoveToFoundation(pile,card) {//UI
+    console.debug(">MoveToFoundation")
     let move = false;
     if(card) {
         for(let key of foundation.keys) {
@@ -696,6 +710,8 @@ function AutoMoveToFoundation(pile,card) {//UI
                 Undo.add(pile,target);
                 target.ok(card);
                 target.add(card);
+                console.debug("MoveToFoundation true");
+                AutoPlay(false,true);
                 return true;
             }
         }
@@ -943,7 +959,8 @@ function init() {
     //BUTTONS--------------------
     let $avail = $("#available").on("click",(e)=>{
         Interact();
-        GetAvailable()});//UI
+        AutoPlay("always",false);
+    });//UI
     $avail.on("dblclick",(e)=>{
         Preferences.toggle("auto");
         $("#available").toggleClass("automatic",Preferences.auto);
@@ -965,7 +982,7 @@ function init() {
         Preferences.toggle("rules");
     }
     $("#available").toggleClass("automatic",Preferences.auto);
-    if(Preferences.auto) {setTimeout(GetAvailable,500);}
+    AutoPlay(false,"wait");
     if(Preferences.left) {Reverse();}
     $("body").toggleClass("left",Preferences.left);
     console.log("=====READY=====");
